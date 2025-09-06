@@ -4,37 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Karigar-Sarthi</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="container">
+    <header>
         <h1>Karigar-Sarthi Digital Workshop</h1>
+    </header>
 
-        <!-- Module 1: Design Generation -->
-        <div class="module">
-            <h2>Step 1: Generate a New Design</h2>
-            <p>Describe your product idea, and our AI will create design concepts for you from multiple angles.</p>
-            <form id="design-form">
-                <input type="text" id="prompt-input" name="prompt" placeholder="e.g., 'terracotta vase with floral patterns'" required>
-                <button type="submit" id="generate-btn">Generate Images</button>
-            </form>
-            
-            <div id="loading-spinner" class="hidden">
-                <div class="spinner"></div>
-                <p>Generating... this may take a moment.</p>
-            </div>
-            
-            <div id="image-gallery-wrapper">
-                <h3>Generated Designs:</h3>
-                <div id="image-gallery">
-                    <!-- Generated images will be displayed here -->
+    <main>
+        <!-- Error Display Area -->
+        <div id="error-container" class="hidden"></div>
+
+        <!-- Main content now stacks vertically -->
+        <div class="main-content">
+
+            <!-- STAGE 1: Ideation -->
+            <div id="stage-1-ideation" class="module">
+                <h2>Step 1: Generate a New Design Idea</h2>
+                <form id="idea-form">
+                    <p>Describe your product idea, and we'll generate four unique styles.</p>
+                    <input type="text" id="prompt-input" name="prompt" placeholder="e.g., 'terracotta vase with floral patterns'" required>
+                    <button type="submit">Generate Ideas</button>
+                </form>
+                <div id="idea-loading-spinner" class="spinner-container hidden">
+                    <div class="spinner"></div>
+                    <p>Generating ideas...</p>
+                </div>
+                <div id="idea-gallery-container" class="hidden">
+                    <h3>Select Your Favorite Design:</h3>
+                    <div id="idea-gallery" class="gallery"></div>
                 </div>
             </div>
+
+            <!-- STAGE 2: Angle Generation -->
+            <div id="stage-2-angles" class="module hidden">
+                <h2>Step 2: Generate Different Angles</h2>
+                <p>Here is your selected design, now viewed from multiple angles.</p>
+                <div class="gallery-container-stacked">
+                    <div id="selected-image-display"></div>
+                    <div id="angle-loading-spinner" class="spinner-container hidden">
+                        <div class="spinner"></div>
+                        <p>Generating angles...</p>
+                    </div>
+                    <div id="angle-gallery" class="gallery"></div>
+                </div>
+                <button id="reset-button">Start Over</button>
+            </div>
+            
+            <!-- STAGE 3: Image Upload and Edit -->
+            <div id="stage-3-edit" class="module">
+                <h2>Step 3: Edit an Image</h2>
+                <form id="edit-form">
+                    <p>Upload an image and describe the change you want to make.</p>
+                    <div class="form-column">
+                        <input type="file" id="image-upload-input" accept="image/*" required>
+                        <input type="text" id="edit-prompt-input" placeholder="e.g., 'change the color to blue'" required>
+                    </div>
+                    <button type="submit">Edit Image</button>
+                </form>
+                <div id="edit-loading-spinner" class="spinner-container hidden">
+                    <div class="spinner"></div>
+                    <p>Editing your image...</p>
+                </div>
+                <div id="edit-gallery-container" class="hidden">
+                     <div class="gallery-container-side-by-side">
+                        <div id="image-preview" class="image-box">
+                            <h4>Original</h4>
+                        </div>
+                        <div id="edited-image-result" class="image-box">
+                            <h4>Edited</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </div>
+    </main>
     
-    <!-- The url_for helper correctly points to the script in the 'static' folder -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
+

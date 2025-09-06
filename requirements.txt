@@ -1,0 +1,4 @@
+# requirements.txt
+Flask
+google-cloud-aiplatform
+google-cloud-firestore
