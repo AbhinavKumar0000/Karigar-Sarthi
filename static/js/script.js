@@ -1,75 +1,117 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Stage 1 Elements
-    const stage1 = document.getElementById('stage-1-ideation');
+    // Form elements
     const ideaForm = document.getElementById('idea-form');
-    const promptInput = document.getElementById('prompt-input');
+    const ideaPromptInput = document.getElementById('idea-prompt-input');
+    const editForm = document.getElementById('edit-form');
+    const editPromptInput = document.getElementById('edit-prompt-input');
+    const imageUploadInput = document.getElementById('image-upload-input');
+
+    // Modules
+    const angleModule = document.getElementById('angle-module');
+    const editModule = document.getElementById('edit-module');
+
+    // Gallery and Loader elements
     const ideaGallery = document.getElementById('idea-gallery');
     const ideaGalleryContainer = document.getElementById('idea-gallery-container');
-    const ideaLoadingSpinner = document.getElementById('idea-loading-spinner');
+    const ideaGalleryLoader = document.getElementById('idea-gallery-loader');
 
-    // Stage 2 Elements
-    const stage2 = document.getElementById('stage-2-angles');
-    const selectedImageDisplay = document.getElementById('selected-image-display');
     const angleGallery = document.getElementById('angle-gallery');
-    const angleLoadingSpinner = document.getElementById('angle-loading-spinner');
-    const resetButton = document.getElementById('reset-button');
+    const angleGalleryContainer = document.getElementById('angle-gallery-container');
+    const angleGalleryLoader = document.getElementById('angle-gallery-loader');
 
-    // Stage 3 Elements
-    const stage3 = document.getElementById('stage-3-edit');
-    const editForm = document.getElementById('edit-form');
-    const imageUploadInput = document.getElementById('image-upload-input');
-    const editPromptInput = document.getElementById('edit-prompt-input');
-    const imagePreview = document.getElementById('image-preview');
-    const editedImageResult = document.getElementById('edited-image-result');
-    const editGalleryContainer = document.getElementById('edit-gallery-container');
-    const editLoadingSpinner = document.getElementById('edit-loading-spinner');
-
-    // Shared Elements
-    const errorContainer = document.getElementById('error-container');
+    const editedImageContainer = document.getElementById('edited-image-container');
+    const editedImageLoader = document.getElementById('edited-image-loader');
     
-    // --- STATE ---
-    let generatedPrompts = [];
-    let uploadedImageBase64 = null;
+    // Edit section elements
+    const imageToEditPreview = document.getElementById('image-to-edit-preview');
+    const uploadPrompt = document.getElementById('upload-prompt');
 
-    // --- STAGE 1: GENERATE IDEAS ---
-    ideaForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        if (!promptInput.value) return;
+    // Store data between stages
+    let activePrompts = [];
+    let imageForEditingB64 = null;
 
-        resetUI(false); // Reset partially, keep edit section visible
-        ideaLoadingSpinner.classList.remove('hidden');
+    // --- HELPER FUNCTIONS ---
+    function showLoader(loader) { loader.classList.remove('hidden'); }
+    function hideLoader(loader) { loader.classList.add('hidden'); }
+    function clearGallery(gallery) { gallery.innerHTML = ''; }
+    
+    function displayError(container, error) {
+        container.innerHTML = `<div class="error-message"><strong>Error:</strong> ${error.error || 'An unknown error occurred.'} ${error.details || ''}</div>`;
+    }
+
+    function setupImageForEditing(base64Data) {
+        imageForEditingB64 = base64Data;
+        imageToEditPreview.src = `data:image/png;base64,${base64Data}`;
+        imageToEditPreview.classList.remove('hidden');
+        uploadPrompt.classList.add('hidden');
+        editModule.classList.remove('hidden');
+        editModule.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // --- EVENT LISTENERS ---
+
+    // STAGE 1: Generate Ideas
+    ideaForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const prompt = ideaPromptInput.value;
+        if (!prompt) return;
+
+        clearGallery(ideaGallery);
+        ideaGalleryContainer.classList.add('hidden');
+        showLoader(ideaGalleryLoader);
+        angleModule.classList.add('hidden');
+        editModule.classList.add('hidden');
 
         try {
-            const response = await fetch('/generate-ideas', {
+            const response = await fetch('/refine-and-generate-ideas', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: promptInput.value }),
+                body: JSON.stringify({ prompt }),
             });
             const data = await response.json();
-            if (!response.ok) throw new Error(data.details || 'Failed to generate ideas.');
 
-            generatedPrompts = data.prompts;
-            displayImages(data.images, ideaGallery, handleIdeaSelection);
+            if (!response.ok) throw data;
+
+            activePrompts = data.prompts;
+            ideaGallery.innerHTML = data.images.map((imgB64, index) => `
+                <div class="image-container">
+                    <img src="data:image/png;base64,${imgB64}" alt="Generated AI Design" data-prompt-index="${index}" data-b64="${imgB64}">
+                    <div class="overlay">
+                        <button class="select-design-btn">Select this Design</button>
+                        <button class="edit-idea-btn">Edit this Image</button>
+                    </div>
+                </div>
+            `).join('');
             ideaGalleryContainer.classList.remove('hidden');
+
         } catch (error) {
-            showError(`Error during idea generation: ${error.message}`);
+            displayError(ideaGallery, error);
         } finally {
-            ideaLoadingSpinner.classList.add('hidden');
+            hideLoader(ideaGalleryLoader);
         }
     });
 
-    // --- STAGE 2: GENERATE ANGLES ---
-    async function handleIdeaSelection(event) {
-        const selectedIndex = event.currentTarget.dataset.index;
-        const selectedPrompt = generatedPrompts[selectedIndex];
-        const selectedImageSrc = event.currentTarget.src;
+    // Handle clicks within the idea gallery
+    ideaGallery.addEventListener('click', e => {
+        if (e.target.classList.contains('select-design-btn')) {
+            const img = e.target.closest('.image-container').querySelector('img');
+            const promptIndex = img.dataset.promptIndex;
+            generateAngles(activePrompts[promptIndex]);
+        }
+        if (e.target.classList.contains('edit-idea-btn')) {
+            const img = e.target.closest('.image-container').querySelector('img');
+            setupImageForEditing(img.dataset.b64);
+        }
+    });
 
-        stage1.classList.add('hidden');
-        stage2.classList.remove('hidden');
-        angleGallery.innerHTML = '';
-        selectedImageDisplay.innerHTML = `<img src="${selectedImageSrc}" alt="Selected Design">`;
-        angleLoadingSpinner.classList.remove('hidden');
-        hideError();
+    // STAGE 2: Generate Angles
+    async function generateAngles(selectedPrompt) {
+        angleModule.classList.remove('hidden');
+        clearGallery(angleGallery);
+        angleGalleryContainer.classList.add('hidden');
+        showLoader(angleGalleryLoader);
+        editModule.classList.add('hidden');
+        angleModule.scrollIntoView({ behavior: 'smooth' });
 
         try {
             const response = await fetch('/generate-angles', {
@@ -78,105 +120,73 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ selected_prompt: selectedPrompt }),
             });
             const data = await response.json();
-            if (!response.ok) throw new Error(data.details || 'Failed to generate angles.');
+            if (!response.ok) throw data;
 
-            displayImages(data.images, angleGallery);
+            angleGallery.innerHTML = data.images.map(imgB64 => `
+                 <div class="image-container">
+                    <img src="data:image/png;base64,${imgB64}" alt="Generated Angle" data-b64="${imgB64}">
+                     <div class="overlay">
+                        <button class="edit-idea-btn">Edit this Image</button>
+                    </div>
+                </div>
+            `).join('');
+            angleGalleryContainer.classList.remove('hidden');
+
         } catch (error) {
-            showError(`Error during angle generation: ${error.message}`);
+            displayError(angleGallery, error);
         } finally {
-            angleLoadingSpinner.classList.add('hidden');
+            hideLoader(angleGalleryLoader);
         }
     }
-
-    // --- STAGE 3: UPLOAD AND EDIT IMAGE ---
-    imageUploadInput.addEventListener('change', () => {
-        const file = imageUploadInput.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                uploadedImageBase64 = reader.result.split(',')[1];
-                imagePreview.innerHTML = `<img src="${reader.result}" alt="Image Preview">`;
-                editGalleryContainer.classList.remove('hidden');
-                editedImageResult.innerHTML = `<h4>Edited</h4>`; // Reset edited view
-            };
-            reader.readAsDataURL(file);
+    
+    // Handle clicks within the angle gallery
+    angleGallery.addEventListener('click', e => {
+        if (e.target.classList.contains('edit-idea-btn')) {
+            const img = e.target.closest('.image-container').querySelector('img');
+            setupImageForEditing(img.dataset.b64);
         }
     });
 
-    editForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        if (!uploadedImageBase64 || !editPromptInput.value) {
-            showError("Please upload an image and provide an edit instruction.");
+
+    // STAGE 3: Edit an Image
+    imageUploadInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = event => {
+            const base64String = event.target.result.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
+            setupImageForEditing(base64String);
+        };
+        reader.readAsDataURL(file);
+    });
+
+    editForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const prompt = editPromptInput.value;
+        if (!prompt || !imageForEditingB64) {
+            alert('Please select an image and provide an edit instruction.');
             return;
         }
-        
-        editLoadingSpinner.classList.remove('hidden');
-        editedImageResult.innerHTML = `<h4>Edited</h4>`;
-        hideError();
+
+        clearGallery(editedImageContainer);
+        showLoader(editedImageLoader);
 
         try {
             const response = await fetch('/edit-image', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ image_data: uploadedImageBase64, prompt: editPromptInput.value }),
+                body: JSON.stringify({ prompt, image_data: imageForEditingB64 }),
             });
             const data = await response.json();
-            if (!response.ok) throw new Error(data.details || 'Failed to edit image.');
-            
-            editedImageResult.innerHTML = `<h4>Edited</h4><img src="data:image/png;base64,${data.image}" alt="Edited Result">`;
+            if (!response.ok) throw data;
+
+            editedImageContainer.innerHTML = `<img src="data:image/png;base64,${data.image}" alt="Edited Result">`;
 
         } catch (error) {
-            showError(`Error during image editing: ${error.message}`);
+            displayError(editedImageContainer, error);
         } finally {
-            editLoadingSpinner.classList.add('hidden');
+            hideLoader(editedImageLoader);
         }
     });
-
-    // --- UI UTILITY FUNCTIONS ---
-    function resetUI(fullReset = true) {
-        stage1.classList.remove('hidden');
-        stage2.classList.add('hidden');
-        ideaGallery.innerHTML = '';
-        angleGallery.innerHTML = '';
-        ideaGalleryContainer.classList.add('hidden');
-        promptInput.value = '';
-        hideError();
-
-        if (fullReset) {
-            stage3.classList.remove('hidden');
-            editGalleryContainer.classList.add('hidden');
-            imagePreview.innerHTML = '<h4>Original</h4>';
-            editedImageResult.innerHTML = '<h4>Edited</h4>';
-            editPromptInput.value = '';
-            imageUploadInput.value = null;
-        }
-    }
-    
-    function displayImages(images, galleryElement, clickHandler) {
-        galleryElement.innerHTML = '';
-        images.forEach((base64Image, index) => {
-            const imgElement = document.createElement('img');
-            imgElement.src = `data:image/png;base64,${base64Image}`;
-            imgElement.alt = "Generated AI Design";
-            imgElement.dataset.index = index;
-
-            if (clickHandler) {
-                imgElement.addEventListener('click', clickHandler);
-                imgElement.classList.add('selectable');
-            }
-            galleryElement.appendChild(imgElement);
-        });
-    }
-
-    resetButton.addEventListener('click', () => resetUI(true));
-
-    function showError(message) {
-        errorContainer.textContent = message;
-        errorContainer.classList.remove('hidden');
-    }
-
-    function hideError() {
-        errorContainer.classList.add('hidden');
-    }
 });
 

@@ -1,55 +1,53 @@
 import base64
 import os
-import time
-import random
+import json
+import re
 from flask import Flask, request, jsonify, render_template
 from google.cloud import firestore
-from google.api_core import exceptions
 import vertexai
-from vertexai.preview.vision_models import ImageGenerationModel, Image
+from vertexai.preview.vision_models import ImageGenerationModel
 from vertexai.preview.generative_models import GenerativeModel, Part
+import google.auth
+
+# --- Configuration & Pre-flight Check ---
+HARDCODED_PROJECT_ID = "burnished-sweep-471303-v4"
+LOCATION = "us-central1"
+
+try:
+    credentials, project_id = google.auth.default()
+    detected_project_id = project_id or os.environ.get('GOOGLE_CLOUD_PROJECT')
+    if detected_project_id:
+        print(f"--- DIAGNOSTIC: Found credentials. Project ID is '{detected_project_id}' ---")
+    else:
+        print("--- DIAGNOSTIC WARNING: Credentials found, but no Project ID was detected. ---")
+except Exception as e:
+    print(f"--- DIAGNOSTIC FAILED: Could not find Google Cloud credentials. Error: {e} ---")
 
 # --- Initialization ---
 app = Flask(__name__)
 
-# --- Configuration ---
-PROJECT_ID = "burnished-sweep-471303-v4"
-LOCATION = "us-central1"
-
 # --- Connect to Google Cloud Services ---
 try:
-    vertexai.init(project=PROJECT_ID, location=LOCATION)
-    db = firestore.Client(project=PROJECT_ID)
+    vertexai.init(project=HARDCODED_PROJECT_ID, location=LOCATION)
+    db = firestore.Client(project=HARDCODED_PROJECT_ID)
     print("--- Successfully initialized Vertex AI and Firestore. ---")
 except Exception as e:
     print(f"--- FAILED to initialize Google Cloud services: {e} ---")
 
-
-# --- Helper Functions for Prompt Engineering ---
-
-def create_ideation_prompts(base_prompt):
+# --- Helper Function ---
+def extract_json_from_response(response_text):
     """
-    Creates 4 stylistically different prompts to generate a range of ideas.
+    Robustly extracts a JSON array from the raw text response of an LLM.
     """
-    styles = [
-        f"A minimalist {base_prompt}, clean lines, simple form, professional product photo, white background, studio lighting.",
-        f"An intricately detailed {base_prompt} with elaborate patterns, ornate design, professional product photo, dark background, dramatic lighting.",
-        f"A rustic, handcrafted {base_prompt} with a rough, earthy texture, professional product photo, natural light, on a wooden surface.",
-        f"A modern, geometric {base_prompt} with bold shapes and abstract patterns, professional product photo, bright, colorful background."
-    ]
-    return styles
-
-def create_angle_prompts(selected_prompt):
-    """
-    Refines prompts to be more forceful about object consistency for angle generation.
-    """
-    angles = [
-        f"{selected_prompt} | An image of this exact same object from the side view. Seamless white background. Professional product photography.",
-        f"{selected_prompt} | An image of this exact same object from a 45-degree angle view. Seamless white background. Professional product photography.",
-        f"{selected_prompt} | An image of this exact same object from a top-down view. Seamless white background. Professional product photography.",
-        f"{selected_prompt} | A lifestyle photograph of this exact same object, placed naturally on a rustic wooden table."
-    ]
-    return angles
+    match = re.search(r'```json\s*(\[.*?\])\s*```', response_text, re.DOTALL)
+    if match:
+        return match.group(1)
+    
+    match = re.search(r'(\[.*?\])', response_text, re.DOTALL)
+    if match:
+        return match.group(0)
+        
+    raise ValueError("Could not find a valid JSON array in the LLM response.")
 
 # --- API Routes ---
 
@@ -58,119 +56,109 @@ def index():
     """Renders the main dashboard page."""
     return render_template('index.html')
 
-@app.route('/generate-ideas', methods=['POST'])
-def generate_ideas():
-    """
-    STAGE 1: Generates four design ideas and the prompts.
-    """
+@app.route('/refine-and-generate-ideas', methods=['POST'])
+def refine_and_generate_ideas():
     try:
         data = request.get_json()
-        if not data or 'prompt' not in data:
+        user_prompt = data.get('prompt')
+        if not user_prompt:
             return jsonify({"error": "No prompt provided"}), 400
 
-        user_prompt = data['prompt']
-        ideation_prompts = create_ideation_prompts(user_prompt)
+        # UPGRADE: Using a more powerful and stable model for better results.
+        text_model = GenerativeModel("gemini-1.5-flash-preview-0514")
+        refinement_instruction = (
+            f"You are a creative assistant for an artisan. A user has a simple product idea: '{user_prompt}'. "
+            "Your task is to expand this into four distinct, highly detailed prompts for an advanced AI image generation model. "
+            "Each prompt should describe a unique style: 1. Minimalist, 2. Ornate/Intricate, 3. Rustic/Handcrafted, 4. Modern/Abstract. "
+            "Focus on visual details like material, texture, lighting, patterns, and background. "
+            'Return ONLY a valid JSON array of 4 strings, where each string is a detailed prompt. Example format: ["prompt 1", "prompt 2", "prompt 3", "prompt 4"]'
+        )
         
-        model = ImageGenerationModel.from_pretrained("imagegeneration@006")
+        response = text_model.generate_content(refinement_instruction)
+        
+        json_string = extract_json_from_response(response.text)
+        refined_prompts = json.loads(json_string)
+
+        if not refined_prompts or len(refined_prompts) != 4:
+            raise ValueError("LLM did not return the expected 4 prompts in JSON format.")
+
+        image_model = ImageGenerationModel.from_pretrained("imagegeneration@006")
         base64_images = []
-        
-        print(f"Generating {len(ideation_prompts)} ideas.")
+        for prompt in refined_prompts:
+            gen_response = image_model.generate_images(prompt=prompt, number_of_images=1)
+            base64_images.append(base64.b64encode(gen_response[0]._image_bytes).decode('utf-8'))
 
-        for prompt in ideation_prompts:
-            # FIX: Removed 'seed' parameter as it's not compatible with watermarking.
-            response = model.generate_images(prompt=prompt, number_of_images=1)
-            img_bytes = response[0]._image_bytes
-            base64_images.append(base64.b64encode(img_bytes).decode('utf-8'))
-
-        print("Successfully generated ideas.")
-        return jsonify({"images": base64_images, "prompts": ideation_prompts})
+        return jsonify({"images": base64_images, "prompts": refined_prompts})
 
     except Exception as e:
-        error_type = type(e).__name__
-        error_details = str(e)
-        return jsonify({"error": "Failed to generate ideas.", "details": f"{error_type}: {error_details}"}), 500
+        return jsonify({"error": "Failed to generate ideas.", "details": f"{type(e).__name__}: {str(e)}"}), 500
 
 @app.route('/generate-angles', methods=['POST'])
 def generate_angles():
-    """
-    STAGE 2: Receives a prompt and generates different angles of the same object.
-    """
     try:
         data = request.get_json()
-        if not data or 'selected_prompt' not in data:
-            return jsonify({"error": "Missing prompt"}), 400
+        selected_prompt = data.get('selected_prompt')
+        if not selected_prompt:
+            return jsonify({"error": "Missing selected prompt"}), 400
 
-        selected_prompt = data['selected_prompt']
-        angle_prompts = create_angle_prompts(selected_prompt)
-        model = ImageGenerationModel.from_pretrained("imagegeneration@006")
+        text_model = GenerativeModel("gemini-1.5-flash-preview-0514")
+        angle_instruction = (
+            f"You are a professional product photography assistant. An image generation AI has created an object based on this detailed description: '{selected_prompt}'. "
+            "Your task is to generate 4 new prompts to render the *exact same object* but from different camera angles. "
+            "The angles are: 1. Side view, 2. 45-degree angle view, 3. Top-down view, 4. A lifestyle shot on a relevant surface (e.g., a wooden table for a rustic item). "
+            "For the first three, specify a seamless, professional white studio background. "
+            'Return ONLY a valid JSON array of 4 strings, where each string is a new prompt for a specific angle.'
+        )
+
+        response = text_model.generate_content(angle_instruction)
+        
+        json_string = extract_json_from_response(response.text)
+        angle_prompts = json.loads(json_string)
+
+        if not angle_prompts or len(angle_prompts) != 4:
+            raise ValueError("LLM did not return the expected 4 angle prompts in JSON format.")
+
+        image_model = ImageGenerationModel.from_pretrained("imagegeneration@006")
         base64_images = []
-
-        print(f"Generating {len(angle_prompts)} angles.")
         for prompt in angle_prompts:
-            # FIX: Removed 'seed' parameter. Consistency relies on the detailed prompt.
-            response = model.generate_images(prompt=prompt, number_of_images=1)
-            img_bytes = response[0]._image_bytes
-            base64_images.append(base64.b64encode(img_bytes).decode('utf-8'))
+            gen_response = image_model.generate_images(prompt=prompt, number_of_images=1)
+            base64_images.append(base64.b64encode(gen_response[0]._image_bytes).decode('utf-8'))
 
-        print("Successfully generated angles.")
         return jsonify({"images": base64_images})
 
     except Exception as e:
-        error_type = type(e).__name__
-        error_details = str(e)
-        return jsonify({"error": "Failed to generate angles.", "details": f"{error_type}: {error_details}"}), 500
+        return jsonify({"error": "Failed to generate angles.", "details": f"{type(e).__name__}: {str(e)}"}), 500
 
 @app.route('/edit-image', methods=['POST'])
 def edit_image():
-    """
-    STAGE 3: Describes an uploaded image with a multimodal model, then combines the
-    description with the user's edit prompt to generate a new, edited image.
-    """
     try:
         data = request.get_json()
-        if not data or 'image_data' not in data or 'prompt' not in data:
+        image_b64 = data.get('image_data')
+        user_edit_prompt = data.get('prompt')
+        if not all([image_b64, user_edit_prompt]):
             return jsonify({"error": "Missing image data or prompt"}), 400
 
-        image_b64 = data['image_data']
-        user_edit_prompt = data['prompt']
-        
         image_bytes = base64.b64decode(image_b64)
-
-        # 1. Describe the image using Gemini Pro Vision
-        # FIX: Changed model name to the correct, generally available version.
-        vision_model = GenerativeModel("gemini-pro-vision")
+        
+        vision_model = GenerativeModel("gemini-1.5-flash-preview-0514")
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
         
-        print("Describing uploaded image with Gemini Pro Vision...")
         description_prompt = "Describe this image for an image generation model. Be factual and concise. Focus on the main subject, its style, and the background."
+        
         response = vision_model.generate_content([image_part, description_prompt])
         image_description = response.text
-        print(f"Image description: {image_description}")
-
-        # 2. Combine description with user's edit prompt
+        
         final_generation_prompt = f"{image_description}, but now {user_edit_prompt}."
-        print(f"Final generation prompt: '{final_generation_prompt}'")
 
-        # 3. Generate a new image using the combined prompt
         image_generation_model = ImageGenerationModel.from_pretrained("imagegeneration@006")
+        generation_response = image_generation_model.generate_images(prompt=final_generation_prompt, number_of_images=1)
         
-        generation_response = image_generation_model.generate_images(
-            prompt=final_generation_prompt,
-            number_of_images=1
-        )
-        
-        img_bytes = generation_response[0]._image_bytes
-        edited_image_b64 = base64.b64encode(img_bytes).decode('utf-8')
+        edited_image_b64 = base64.b64encode(generation_response[0]._image_bytes).decode('utf-8')
 
-        print("Successfully generated edited image.")
         return jsonify({"image": edited_image_b64})
 
     except Exception as e:
-        error_type = type(e).__name__
-        error_details = str(e)
-        print(f"An error occurred during image editing: {error_type}: {error_details}")
-        return jsonify({"error": "Failed to edit image.", "details": f"{error_type}: {error_details}"}), 500
-
+        return jsonify({"error": "Failed to edit image.", "details": f"{type(e).__name__}: {str(e)}"}), 500
 
 # --- Main Execution ---
 if __name__ == '__main__':
