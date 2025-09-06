@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karigar-Sarthi</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+<body>
+    <div class="container">
+        <h1>Karigar-Sarthi Digital Workshop</h1>
+
+        <!-- Module 1: Design Generation -->
+        <div class="module">
+            <h2>Step 1: Generate a New Design</h2>
+            <p>Describe your product idea, and our AI will create design concepts for you from multiple angles.</p>
+            <form id="design-form">
+                <input type="text" id="prompt-input" name="prompt" placeholder="e.g., 'terracotta vase with floral patterns'" required>
+                <button type="submit" id="generate-btn">Generate Images</button>
+            </form>
+            
+            <div id="loading-spinner" class="hidden">
+                <div class="spinner"></div>
+                <p>Generating... this may take a moment.</p>
+            </div>
+            
+            <div id="image-gallery-wrapper">
+                <h3>Generated Designs:</h3>
+                <div id="image-gallery">
+                    <!-- Generated images will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- The url_for helper correctly points to the script in the 'static' folder -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
