@@ -64,18 +64,16 @@ def refine_and_generate_ideas():
         if not user_prompt:
             return jsonify({"error": "No prompt provided"}), 400
 
-        # UPGRADE: Using a more powerful and stable model for better results.
-        text_model = GenerativeModel("gemini-1.5-flash-preview-0514")
+        text_model = GenerativeModel("gemini-2.5-pro")
         refinement_instruction = (
-            f"You are a creative assistant for an artisan. A user has a simple product idea: '{user_prompt}'. "
-            "Your task is to expand this into four distinct, highly detailed prompts for an advanced AI image generation model. "
-            "Each prompt should describe a unique style: 1. Minimalist, 2. Ornate/Intricate, 3. Rustic/Handcrafted, 4. Modern/Abstract. "
-            "Focus on visual details like material, texture, lighting, patterns, and background. "
-            'Return ONLY a valid JSON array of 4 strings, where each string is a detailed prompt. Example format: ["prompt 1", "prompt 2", "prompt 3", "prompt 4"]'
+            f"You are a creative guide for an Indian artisan. The user's idea is: '{user_prompt}'. "
+            "Your first task is to ensure the output is always an artisan craft object. If the user's prompt is not a craft (e.g., 'a car'), you must reinterpret it as a theme for a craft (e.g., 'a hand-carved wooden toy car with traditional Indian motifs'). "
+            "Then, expand the idea into four distinct, highly detailed prompts for an AI image model, reflecting diverse Indian aesthetics. Focus on texture, material, and design rooted in Indian culture, without being limited to specific named styles. "
+            "The four styles are: 1. Vibrant & Festive (using bold colors from Indian festivals, celebratory motifs), 2. Earthy & Rustic (using natural materials like clay, jute, wood, with a raw, handcrafted feel), 3. Intricate & Ornate (with fine, detailed carving or filigree work, inspired by royal crafts), 4. Modern & Geometric (a contemporary take on Indian patterns with clean lines and abstract shapes). "
+            'Return ONLY a valid JSON array of 4 strings. Example: ["prompt 1", "prompt 2", "prompt 3", "prompt 4"]'
         )
         
         response = text_model.generate_content(refinement_instruction)
-        
         json_string = extract_json_from_response(response.text)
         refined_prompts = json.loads(json_string)
 
@@ -97,26 +95,26 @@ def refine_and_generate_ideas():
 def generate_angles():
     try:
         data = request.get_json()
-        selected_prompt = data.get('selected_prompt')
-        if not selected_prompt:
-            return jsonify({"error": "Missing selected prompt"}), 400
+        image_b64 = data.get('image_data')
+        if not image_b64:
+            return jsonify({"error": "Missing image data"}), 400
 
-        text_model = GenerativeModel("gemini-1.5-flash-preview-0514")
-        angle_instruction = (
-            f"You are a professional product photography assistant. An image generation AI has created an object based on this detailed description: '{selected_prompt}'. "
-            "Your task is to generate 4 new prompts to render the *exact same object* but from different camera angles. "
-            "The angles are: 1. Side view, 2. 45-degree angle view, 3. Top-down view, 4. A lifestyle shot on a relevant surface (e.g., a wooden table for a rustic item). "
-            "For the first three, specify a seamless, professional white studio background. "
-            'Return ONLY a valid JSON array of 4 strings, where each string is a new prompt for a specific angle.'
-        )
-
-        response = text_model.generate_content(angle_instruction)
+        image_bytes = base64.b64decode(image_b64)
         
-        json_string = extract_json_from_response(response.text)
-        angle_prompts = json.loads(json_string)
+        vision_model = GenerativeModel("gemini-2.5-pro")
+        image_part = Part.from_data(data=image_bytes, mime_type="image/png")
+        
+        description_prompt = "You are a master artisan. Describe the object in this image with extreme detail for a fellow artisan. Mention the material, exact colors, specific patterns, texture, and overall craft style. Be factual and precise."
+        
+        response = vision_model.generate_content([image_part, description_prompt])
+        image_description = response.text
 
-        if not angle_prompts or len(angle_prompts) != 4:
-            raise ValueError("LLM did not return the expected 4 angle prompts in JSON format.")
+        angle_prompts = [
+            f"A professional, side profile photograph of this object: '{image_description}', on a seamless, brightly lit white studio background.",
+            f"A professional, 45-degree angle three-quarter photograph of this object: '{image_description}', on a seamless, brightly lit white studio background.",
+            f"A professional, top-down 'flat lay' photograph of this object: '{image_description}', on a seamless, brightly lit white studio background.",
+            f"A realistic lifestyle photograph of this object: '{image_description}', placed in a culturally relevant Indian setting like on a 'charpai' or a 'marble inlay table'."
+        ]
 
         image_model = ImageGenerationModel.from_pretrained("imagegeneration@006")
         base64_images = []
@@ -140,15 +138,21 @@ def edit_image():
 
         image_bytes = base64.b64decode(image_b64)
         
-        vision_model = GenerativeModel("gemini-1.5-flash-preview-0514")
+        vision_model = GenerativeModel("gemini-2.5-pro")
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
         
-        description_prompt = "Describe this image for an image generation model. Be factual and concise. Focus on the main subject, its style, and the background."
-        
+        description_prompt = "Describe the object in this image in extreme detail for an AI image model. Focus on material, color, patterns, and style. Be factual and precise."
         response = vision_model.generate_content([image_part, description_prompt])
         image_description = response.text
         
-        final_generation_prompt = f"{image_description}, but now {user_edit_prompt}."
+        # FIX: Re-engineered the final prompt to be much more specific and forceful, improving accuracy.
+        final_generation_prompt = (
+            f"You are an expert photo editor. Your task is to edit an image of an artisan craft object. "
+            f"The object is described as: '{image_description}'. "
+            "You must not change the core shape, material, or primary design of the object. "
+            f"Your ONLY task is to apply this specific modification: '{user_edit_prompt}'. "
+            "Preserve all other details of the original object to make it look like a direct edit."
+        )
 
         image_generation_model = ImageGenerationModel.from_pretrained("imagegeneration@006")
         generation_response = image_generation_model.generate_images(prompt=final_generation_prompt, number_of_images=1)

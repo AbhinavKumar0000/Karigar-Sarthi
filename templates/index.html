@@ -3,85 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Karigar-Sarthi Digital Workshop</title>
+    <title>Karigar-Sarthi - Your Digital Workshop</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
-        <h1>Karigar-Sarthi</h1>
-        <p>Your AI-Powered Digital Workshop</p>
+        <h1 data-key="main_title">Karigar-Sarthi</h1>
+        <div class="header-controls">
+            <p data-key="subtitle">Your AI-Powered Digital Workshop</p>
+            <div class="language-toggle">
+                <span data-key="lang_en">EN</span>
+                <label class="switch">
+                    <input type="checkbox" id="language-switch">
+                    <span class="slider round"></span>
+                </label>
+                <span data-key="lang_hi">HI</span>
+            </div>
+        </div>
     </header>
 
-    <main>
-        <!-- Generation Module -->
-        <div class="module">
-            <h2>Design Generation</h2>
-            <p>Start with a simple idea, and we'll generate unique designs for you.</p>
-            <form id="idea-form">
-                <input type="text" id="idea-prompt-input" placeholder="e.g., 'terracotta vase with floral patterns'" required>
-                <button type="submit">Generate Ideas</button>
-            </form>
+    <main class="container">
+        <!-- User's starting choice -->
+        <div class="start-choice-container">
+            <!-- Section for creating a new idea -->
+            <section id="idea-section" class="workflow-section">
+                <h2 data-key="idea_title">1. Create a New Idea</h2>
+                <p class="description" data-key="idea_desc">Describe your concept, and our AI will generate four unique designs inspired by diverse Indian aesthetics.</p>
+                <form id="idea-form">
+                    <input type="text" id="idea-prompt-input" data-key-placeholder="idea_placeholder" placeholder="e.g., 'a wooden elephant toy', 'a terracotta Diya'" required>
+                    <button type="submit" data-key="idea_button">Generate Designs</button>
+                </form>
+            </section>
             
-            <div id="idea-gallery-loader" class="skeleton-loader-container hidden">
-                <div class="skeleton"></div>
-                <div class="skeleton"></div>
-                <div class="skeleton"></div>
-                <div class="skeleton"></div>
-            </div>
-            <div id="idea-gallery-container">
-                <h3>Choose a Design</h3>
-                <div id="idea-gallery" class="gallery">
-                    <!-- Generated ideas will appear here -->
-                </div>
-            </div>
+            <!-- Section for uploading an existing image -->
+            <section id="upload-section" class="workflow-section">
+                <h2 data-key="upload_title">2. Upload & Edit an Image</h2>
+                <p class="description" data-key="upload_desc">Have a photo already? Upload it here to start editing or generate different angles.</p>
+                <label for="upload-image-input" class="upload-btn" data-key="upload_button">Upload Your Image</label>
+                <input type="file" id="upload-image-input" accept="image/*" class="hidden">
+            </section>
         </div>
 
-        <!-- Angle Generation Module -->
-        <div id="angle-module" class="module hidden">
-            <h2>Angle Generation</h2>
-            <p>We'll now generate your selected design from multiple camera angles.</p>
-            <div id="angle-gallery-loader" class="skeleton-loader-container hidden">
-                <div class="skeleton"></div>
-                <div class="skeleton"></div>
-                <div class="skeleton"></div>
-                <div class="skeleton"></div>
-            </div>
-            <div id="angle-gallery-container">
-                 <h3>Different Angles</h3>
-                <div id="angle-gallery" class="gallery">
-                    <!-- Different angles will appear here -->
-                </div>
-            </div>
-        </div>
+        <!-- Galleries and subsequent steps appear here -->
+        <div id="results-container">
+            <section id="idea-gallery-section" class="workflow-section hidden">
+                <h3 data-key="results_title">Generated Designs</h3>
+                <p class="description" data-key="results_desc">Click an image to select it for the next steps.</p>
+                <div id="idea-gallery" class="image-gallery"></div>
+            </section>
 
-        <!-- Editing Module -->
-        <div id="edit-module" class="module hidden">
-            <h2>Image Editor</h2>
-            <p>Refine any generated image or upload your own to make edits.</p>
-            <div class="editor-layout">
-                <div class="image-preview-container">
-                     <h3>Image to Edit</h3>
-                    <img id="image-to-edit-preview" src="#" alt="Selected image for editing" class="hidden">
-                    <div id="upload-prompt">
-                        <p>Select an image from the galleries above or</p>
-                        <input type="file" id="image-upload-input" accept="image/*">
+            <section id="angle-section" class="workflow-section hidden">
+                <h3 data-key="angle_title">Generate Different Angles</h3>
+                <p class="description" data-key="angle_desc">Let's create professional product shots from different camera angles for your selected design.</p>
+                <div class="selected-image-container">
+                    <img id="selected-image-for-angles" src="" alt="Selected Design">
+                </div>
+                <button id="generate-angles-btn" data-key="angle_button">Generate 4 Angles</button>
+                <div id="angle-gallery" class="image-gallery"></div>
+            </section>
+
+            <section id="edit-section" class="workflow-section hidden">
+                <h3 data-key="edit_title">Edit Your Design</h3>
+                <p class="description" data-key="edit_desc">Refine your image. Describe the changes you want to make to the selected photo.</p>
+                <div class="edit-controls">
+                    <div class="selected-image-container">
+                        <img id="selected-image-for-edit" src="" alt="Image to Edit">
+                    </div>
+                    <div class="edit-form-container">
+                        <form id="edit-form">
+                            <input type="text" id="edit-prompt-input" data-key-placeholder="edit_placeholder" placeholder="e.g., 'make the background blue', 'add gold patterns'" required>
+                            <button type="submit" data-key="edit_button">Apply Edit</button>
+                        </form>
                     </div>
                 </div>
-                <form id="edit-form">
-                    <input type="text" id="edit-prompt-input" placeholder="e.g., 'make the patterns blue'" required>
-                    <button type="submit">Refine Image</button>
-                </form>
-            </div>
-
-            <h3>Edited Result</h3>
-            <div id="edited-image-loader" class="skeleton-loader-container hidden">
-                <div class="skeleton"></div>
-            </div>
-            <div id="edited-image-container" class="gallery">
-                <!-- Edited image appears here -->
-            </div>
+                <div id="edit-gallery" class="image-gallery single-image"></div>
+            </section>
         </div>
     </main>
+
+    <!-- Loading overlay with tips -->
+    <div id="tips-loader" class="hidden">
+        <div class="tip-content">
+            <div class="spinner"></div>
+            <p id="tip-text"></p>
+        </div>
+    </div>
     
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
