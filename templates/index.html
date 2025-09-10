@@ -26,7 +26,7 @@
     </header>
 
     <main class="container">
-        <!-- User's starting choice -->
+        <!-- User's starting choices -->
         <div class="start-choice-container">
             <!-- Section for creating a new idea -->
             <section id="idea-section" class="workflow-section">
@@ -46,6 +46,41 @@
                 <input type="file" id="upload-image-input" accept="image/*" class="hidden">
             </section>
         </div>
+
+        <!-- New Material Estimator Section -->
+        <section id="material-estimator-section" class="workflow-section">
+            <h2 data-key="material_title">3. Plan Your Craft & Get Materials</h2>
+            <p class="description" data-key="material_desc">Upload a base image, then describe the final product you want to create. Our AI will generate a list of materials you'll need.</p>
+            
+            <div class="material-workflow-container">
+                <!-- Step 1: Upload -->
+                <div class="material-upload-area">
+                    <label for="material-image-input" class="upload-btn" data-key="material_upload_button">Upload Base Image</label>
+                    <input type="file" id="material-image-input" accept="image/*" class="hidden">
+                    <div class="selected-image-container hidden" id="material-image-preview-container">
+                        <img id="material-image-preview" src="" alt="Image for Material Estimation">
+                    </div>
+                </div>
+
+                <!-- Step 2: Describe -->
+                <div class="material-description-area">
+                    <form id="material-form">
+                        <textarea id="material-description-input" data-key-placeholder="material_placeholder" placeholder="Describe the final product. For example: 'I want to make this wooden toy, but paint it blue with yellow floral patterns and add small wheels.'" required></textarea>
+                        <div class="form-controls">
+                            <button type="button" id="voice-input-btn" title="Use Voice Input">🎤</button>
+                            <button type="submit" data-key="material_button">Get Materials List</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Step 3: Results -->
+            <div id="material-results-container" class="hidden">
+                <h3 data-key="material_results_title">Suggested Materials</h3>
+                <div id="material-results-list"></div>
+            </div>
+        </section>
+
 
         <!-- Galleries and subsequent steps appear here -->
         <div id="results-container">
@@ -95,4 +130,3 @@
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
-

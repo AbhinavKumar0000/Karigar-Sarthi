@@ -21,7 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
             edit_title: "Edit Your Design",
             edit_desc: "Refine your image. Describe the changes you want to make to the selected photo.",
             edit_placeholder: "e.g., 'make the background blue', 'add gold patterns'",
-            edit_button: "Apply Edit"
+            edit_button: "Apply Edit",
+            material_title: "3. Plan Your Craft & Get Materials",
+            material_desc: "Upload a base image, then describe the final product you want to create. Our AI will generate a list of materials you'll need.",
+            material_upload_button: "Upload Base Image",
+            material_placeholder: "Describe the final product. For example: 'I want to make this wooden toy, but paint it blue with yellow floral patterns and add small wheels.'",
+            material_button: "Get Materials List",
+            material_results_title: "Suggested Materials",
         },
         hi: {
             main_title: "कारीगर-सारथी",
@@ -43,7 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
             edit_title: "अपना डिज़ाइन संपादित करें",
             edit_desc: "अपनी छवि को परिष्कृत करें। चयनित फ़ोटो में आप जो परिवर्तन करना चाहते हैं, उनका वर्णन करें।",
             edit_placeholder: "उदा., 'पृष्ठभूमि को नीला बनाएं', 'सुनहरे पैटर्न जोड़ें'",
-            edit_button: "संपादन लागू करें"
+            edit_button: "संपादन लागू करें",
+            material_title: "३. अपनी कला की योजना बनाएं और सामग्री प्राप्त करें",
+            material_desc: "एक आधार छवि अपलोड करें, फिर आप जो अंतिम उत्पाद बनाना चाहते हैं उसका वर्णन करें। हमारा एआई आपकी ज़रूरत की सामग्रियों की एक सूची तैयार करेगा।",
+            material_upload_button: "आधार छवि अपलोड करें",
+            material_placeholder: "अंतिम उत्पाद का वर्णन करें। उदाहरण के लिए: 'मैं यह लकड़ी का खिलौना बनाना चाहता हूं, लेकिन इसे पीले फूलों के पैटर्न से नीले रंग में रंगना और छोटे पहिये जोड़ना चाहता हूं।'",
+            material_button: "सामग्री सूची प्राप्त करें",
+            material_results_title: "सुझाई गई सामग्रियां",
         }
     };
 
@@ -66,9 +78,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const editGallery = document.getElementById('edit-gallery');
     const tipsLoader = document.getElementById('tips-loader');
     const tipText = document.getElementById('tip-text');
+    const materialImageInput = document.getElementById('material-image-input');
+    const materialImagePreview = document.getElementById('material-image-preview');
+    const materialImagePreviewContainer = document.getElementById('material-image-preview-container');
+    const materialForm = document.getElementById('material-form');
+    const materialDescriptionInput = document.getElementById('material-description-input');
+    const voiceInputBtn = document.getElementById('voice-input-btn');
+    const materialResultsContainer = document.getElementById('material-results-container');
+    const materialResultsList = document.getElementById('material-results-list');
+
 
     // --- State Management ---
     let tipInterval;
+    let materialImageB64 = null;
+    let materialsCache = { en: null, hi: null }; // Cache for material list translations
+    let isMaterialRequestActive = false; // Flag to track if a material list is displayed
 
     // --- Tips for Artisans ---
     const artisanTips = {
@@ -114,6 +138,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         localStorage.setItem('language', lang);
         document.documentElement.lang = lang;
+
+        // If a material list has been generated and is cached, simply display the correct version.
+        if (isMaterialRequestActive && materialsCache[lang]) {
+            displayMaterials(materialsCache[lang]);
+        }
     };
 
     languageSwitch.addEventListener('change', (e) => {
@@ -220,6 +249,105 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         reader.readAsDataURL(file);
     });
+
+    // --- New Feature: Material Estimator ---
+
+    // Handle image upload for the new section
+    materialImageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64StringWithData = reader.result;
+            materialImageB64 = base64StringWithData.replace('data:', '').replace(/^.+,/, '');
+            materialImagePreview.src = base64StringWithData;
+            materialImagePreviewContainer.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Handle Voice Input using the Web Speech API
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.lang = localStorage.getItem('language') === 'hi' ? 'hi-IN' : 'en-US';
+
+        voiceInputBtn.addEventListener('click', () => {
+            voiceInputBtn.textContent = '🎙️'; // Listening indicator
+            recognition.start();
+        });
+
+        recognition.onresult = (event) => {
+            const currentTranscript = event.results[0][0].transcript;
+            materialDescriptionInput.value += currentTranscript + ' ';
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            voiceInputBtn.textContent = '🎤'; // Reset on error
+        };
+
+        recognition.onend = () => {
+            voiceInputBtn.textContent = '🎤'; // Reset when done
+        };
+        
+        // Update recognition language when site language changes
+        languageSwitch.addEventListener('change', (e) => {
+            recognition.lang = e.target.checked ? 'hi-IN' : 'en-US';
+        });
+
+    } else {
+        voiceInputBtn.classList.add('hidden'); // Hide button if API not supported
+    }
+
+    // Handle form submission to get materials
+    materialForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!materialImageB64 || !materialDescriptionInput.value) {
+            alert('Please upload an image and provide a description.');
+            return;
+        }
+        
+        const lang = localStorage.getItem('language') || 'en';
+        
+        const body = {
+            image_data: materialImageB64,
+            description: materialDescriptionInput.value,
+        };
+        
+        // This is now a request for both language versions
+        const data = await performApiCall('/get-materials-all-langs', body, materialResultsList);
+
+        if (data && data.materials) {
+            // Cache both results from the single API call
+            materialsCache.en = data.materials.en;
+            materialsCache.hi = data.materials.hi;
+            isMaterialRequestActive = true;
+            
+            // Display the list for the currently selected language
+            displayMaterials(materialsCache[lang]);
+        }
+    });
+
+    // Function to display the materials list
+    const displayMaterials = (materials) => {
+        materialResultsList.innerHTML = ''; // Clear previous results
+        if (!materials || materials.length === 0) {
+            materialResultsList.innerHTML = '<p>Could not determine materials. Please try a more descriptive prompt.</p>';
+            return;
+        }
+
+        const ul = document.createElement('ul');
+        ul.className = 'materials-list';
+        materials.forEach(item => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${item.material}</strong> (Qty: ${item.quantity})<br><em>${item.reason}</em>`;
+            ul.appendChild(li);
+        });
+        materialResultsList.appendChild(ul);
+        materialResultsContainer.classList.remove('hidden');
+    };
 
     // --- UI Helper Functions ---
     const displayImages = (images, galleryElement, allowSelection) => {

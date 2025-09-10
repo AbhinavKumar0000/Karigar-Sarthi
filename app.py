@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, render_template
 from google.cloud import firestore
 import vertexai
 from vertexai.preview.vision_models import ImageGenerationModel
-from vertexai.preview.generative_models import GenerativeModel, Part
+from vertexai.generative_models import GenerativeModel, Part
 import google.auth
 
 # --- Configuration & Pre-flight Check ---
@@ -64,7 +64,7 @@ def refine_and_generate_ideas():
         if not user_prompt:
             return jsonify({"error": "No prompt provided"}), 400
 
-        text_model = GenerativeModel("gemini-2.5-pro")
+        text_model = GenerativeModel("gemini-1.5-pro-preview-0409")
         refinement_instruction = (
             f"You are a creative guide for an Indian artisan. The user's idea is: '{user_prompt}'. "
             "Your first task is to ensure the output is always an artisan craft object. If the user's prompt is not a craft (e.g., 'a car'), you must reinterpret it as a theme for a craft (e.g., 'a hand-carved wooden toy car with traditional Indian motifs'). "
@@ -101,7 +101,7 @@ def generate_angles():
 
         image_bytes = base64.b64decode(image_b64)
         
-        vision_model = GenerativeModel("gemini-2.5-pro")
+        vision_model = GenerativeModel("gemini-1.5-pro-preview-0409")
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
         
         description_prompt = "You are a master artisan. Describe the object in this image with extreme detail for a fellow artisan. Mention the material, exact colors, specific patterns, texture, and overall craft style. Be factual and precise."
@@ -138,14 +138,13 @@ def edit_image():
 
         image_bytes = base64.b64decode(image_b64)
         
-        vision_model = GenerativeModel("gemini-2.5-pro")
+        vision_model = GenerativeModel("gemini-1.5-pro-preview-0409")
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
         
         description_prompt = "Describe the object in this image in extreme detail for an AI image model. Focus on material, color, patterns, and style. Be factual and precise."
         response = vision_model.generate_content([image_part, description_prompt])
         image_description = response.text
         
-        # FIX: Re-engineered the final prompt to be much more specific and forceful, improving accuracy.
         final_generation_prompt = (
             f"You are an expert photo editor. Your task is to edit an image of an artisan craft object. "
             f"The object is described as: '{image_description}'. "
@@ -163,6 +162,48 @@ def edit_image():
 
     except Exception as e:
         return jsonify({"error": "Failed to edit image.", "details": f"{type(e).__name__}: {str(e)}"}), 500
+
+@app.route('/get-materials-all-langs', methods=['POST'])
+def get_materials_all_langs():
+    try:
+        data = request.get_json()
+        image_b64 = data.get('image_data')
+        user_description = data.get('description')
+
+        if not all([image_b64, user_description]):
+            return jsonify({"error": "Missing image data or description"}), 400
+
+        image_bytes = base64.b64decode(image_b64)
+        image_part = Part.from_data(data=image_bytes, mime_type="image/png")
+
+        model = GenerativeModel("gemini-2.5-pro")
+
+        # Step 1: Generate the list in English first for a reliable structure
+        en_prompt = f"""
+            You are an expert artisan. Analyze the image and the user's description to generate a list of raw materials needed.
+            User's goal: "{user_description}"
+            Return ONLY a valid JSON array of objects with "material", "quantity", and "reason" keys in English.
+        """
+        en_response = model.generate_content([image_part, en_prompt])
+        en_json_string = extract_json_from_response(en_response.text)
+        en_materials_list = json.loads(en_json_string)
+
+        # Step 2: Translate the English list to Hindi
+        hi_prompt = f"""
+            You are an expert translator. Translate the 'material' and 'reason' values in the following JSON from English to Hindi.
+            Do not translate the 'quantity' value. Return ONLY the translated valid JSON array.
+            Original JSON: {json.dumps(en_materials_list)}
+        """
+        hi_response = model.generate_content(hi_prompt)
+        hi_json_string = extract_json_from_response(hi_response.text)
+        hi_materials_list = json.loads(hi_json_string)
+
+        # Step 3: Return both lists in a single response object
+        return jsonify({"materials": { "en": en_materials_list, "hi": hi_materials_list }})
+
+    except Exception as e:
+        return jsonify({"error": "Failed to generate materials lists.", "details": f"{type(e).__name__}: {str(e)}"}), 500
+
 
 # --- Main Execution ---
 if __name__ == '__main__':

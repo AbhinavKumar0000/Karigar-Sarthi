@@ -313,6 +313,77 @@ button:hover, .upload-btn:hover {
     }
 }
 
+/* --- New Styles for Material Estimator --- */
+.material-workflow-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.material-upload-area .selected-image-container {
+    margin-top: 1rem;
+}
+
+#material-description-input {
+    width: 100%;
+    min-height: 120px;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    resize: vertical;
+}
+
+.material-description-area #material-form {
+    display: block;
+}
+
+.material-description-area .form-controls {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+#voice-input-btn {
+    padding: 0.75rem;
+    font-size: 1.2rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+#material-results-container {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+.materials-list {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.materials-list li {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.materials-list li:last-child {
+    border-bottom: none;
+}
+
+.materials-list strong {
+    color: var(--primary-color);
+}
+
+.materials-list em {
+    color: #666;
+    font-size: 0.9rem;
+}
+
 @media (max-width: 768px) {
     header {
         flex-direction: column;
@@ -324,5 +395,7 @@ button:hover, .upload-btn:hover {
     .edit-controls {
         flex-direction: column;
     }
+    .material-workflow-container {
+        grid-template-columns: 1fr;
+    }
 }
-
