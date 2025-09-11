@@ -2,12 +2,15 @@ import base64
 import os
 import json
 import re
-from flask import Flask, request, jsonify, render_template
+from functools import wraps # <-- ADD THIS
+from flask import Flask, request, jsonify, render_template, session, redirect, url_for # <-- ADD session, redirect, url_for
 from google.cloud import firestore
 import vertexai
 from vertexai.preview.vision_models import ImageGenerationModel
 from vertexai.generative_models import GenerativeModel, Part
 import google.auth
+import firebase_admin # <-- ADD THIS
+from firebase_admin import credentials, auth # <-- ADD THIS
 
 # --- Configuration & Pre-flight Check ---
 HARDCODED_PROJECT_ID = "burnished-sweep-471303-v4"
@@ -25,6 +28,16 @@ except Exception as e:
 
 # --- Initialization ---
 app = Flask(__name__)
+# ADD A SECRET KEY FOR FLASK SESSIONS
+app.secret_key = os.urandom(24) 
+
+# --- Initialize Firebase Admin SDK ---
+try:
+    # When running on Google Cloud, the Admin SDK can auto-discover credentials
+    firebase_admin.initialize_app()
+    print("--- Successfully initialized Firebase Admin SDK. ---")
+except Exception as e:
+    print(f"--- FAILED to initialize Firebase Admin SDK: {e} ---")
 
 # --- Connect to Google Cloud Services ---
 try:
@@ -33,6 +46,17 @@ try:
     print("--- Successfully initialized Vertex AI and Firestore. ---")
 except Exception as e:
     print(f"--- FAILED to initialize Google Cloud services: {e} ---")
+
+
+# --- NEW: Login Required Decorator ---
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user' not in session:
+            return redirect(url_for('login_page'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 # --- Helper Function ---
 def extract_json_from_response(response_text):
@@ -52,9 +76,53 @@ def extract_json_from_response(response_text):
 # --- API Routes ---
 
 @app.route('/')
+@login_required # <-- PROTECT THIS ROUTE
 def index():
     """Renders the main dashboard page."""
     return render_template('index.html')
+
+
+# --- NEW: Authentication Routes ---
+@app.route('/signup')
+def signup_page():
+    return render_template('signup.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login_page():
+    # This route now serves the login page for GET requests
+    if request.method == 'GET':
+        return render_template('login.html')
+    
+    # And handles the session creation for POST requests
+    try:
+        data = request.get_json()
+        token = data.get('token')
+        if not token:
+            return jsonify({"error": "No token provided"}), 400
+
+        # Verify the ID token with Firebase Admin SDK
+        decoded_token = auth.verify_id_token(token)
+        uid = decoded_token['uid']
+        
+        # Store user info in the session
+        session['user'] = {
+            'uid': uid,
+            'email': decoded_token.get('email')
+        }
+        return jsonify({"status": "success", "message": "User session created"}), 200
+
+    except Exception as e:
+        print(f"Error during login: {e}")
+        return jsonify({"error": "Invalid token or server error"}), 401
+
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None) # Clear the session
+    return redirect(url_for('login_page'))
+
+
+# --- EXISTING API ROUTES (UNMODIFIED) ---
 
 @app.route('/refine-and-generate-ideas', methods=['POST'])
 def refine_and_generate_ideas():
@@ -176,7 +244,7 @@ def get_materials_all_langs():
         image_bytes = base64.b64decode(image_b64)
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
 
-        model = GenerativeModel("gemini-2.5-pro")
+        model = GenerativeModel("gemini-1.5-pro-preview-0409")
 
         # Step 1: Generate the list in English first for a reliable structure
         en_prompt = f"""
@@ -208,4 +276,3 @@ def get_materials_all_langs():
 # --- Main Execution ---
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
-
