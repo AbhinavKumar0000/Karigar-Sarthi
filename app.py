@@ -132,7 +132,7 @@ def refine_and_generate_ideas():
         if not user_prompt:
             return jsonify({"error": "No prompt provided"}), 400
 
-        text_model = GenerativeModel("gemini-1.5-pro-preview-0409")
+        text_model = GenerativeModel("gemini-2.5-pro")
         refinement_instruction = (
             f"You are a creative guide for an Indian artisan. The user's idea is: '{user_prompt}'. "
             "Your first task is to ensure the output is always an artisan craft object. If the user's prompt is not a craft (e.g., 'a car'), you must reinterpret it as a theme for a craft (e.g., 'a hand-carved wooden toy car with traditional Indian motifs'). "
@@ -169,7 +169,7 @@ def generate_angles():
 
         image_bytes = base64.b64decode(image_b64)
         
-        vision_model = GenerativeModel("gemini-1.5-pro-preview-0409")
+        vision_model = GenerativeModel("gemini-2.5-pro")
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
         
         description_prompt = "You are a master artisan. Describe the object in this image with extreme detail for a fellow artisan. Mention the material, exact colors, specific patterns, texture, and overall craft style. Be factual and precise."
@@ -206,7 +206,7 @@ def edit_image():
 
         image_bytes = base64.b64decode(image_b64)
         
-        vision_model = GenerativeModel("gemini-1.5-pro-preview-0409")
+        vision_model = GenerativeModel("gemini-2.5-pro")
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
         
         description_prompt = "Describe the object in this image in extreme detail for an AI image model. Focus on material, color, patterns, and style. Be factual and precise."
@@ -244,7 +244,7 @@ def get_materials_all_langs():
         image_bytes = base64.b64decode(image_b64)
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
 
-        model = GenerativeModel("gemini-1.5-pro-preview-0409")
+        model = GenerativeModel("gemini-2.5-pro")
 
         # Step 1: Generate the list in English first for a reliable structure
         en_prompt = f"""
