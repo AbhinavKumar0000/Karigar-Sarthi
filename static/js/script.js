@@ -31,6 +31,17 @@ document.addEventListener('DOMContentLoaded', () => {
             find_suppliers_button: "Find Online Suppliers",
             suppliers_title: "Online Suppliers",
             listing_button: "Generate Listing Details",
+            suggested_price_title: "Pricing Suggestion",
+            total_materials: "Total Material Cost",
+            estimated_labor: "Estimated Labor",
+            profit_margin: "Profit Margin",
+            selling_price: "Suggested Selling Price",
+            per_piece_cost: "Cost per Piece",
+            listing_story_title: "The Story Behind the Craft",
+            listing_desc_title: "Product Description",
+            listing_features_title: "Key Features",
+            listing_keywords_title: "Keywords",
+            listing_tips_title: "Platform Tips",
         },
         hi: {
             main_title: "कारीगर-सारथी",
@@ -51,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             angle_button: "४ एंगल बनाएं",
             edit_title: "अपना डिज़ाइन संपादित करें",
             edit_desc: "अपनी छवि को परिष्कृत करें। चयनित फ़ोटो में आप जो परिवर्तन करना चाहते हैं, उनका वर्णन करें।",
+            edit_placeholder: "उदा., 'पृष्ठभूमि को नीला बनाएं'",
             edit_button: "संपादन लागू करें",
             material_title: "३. अपनी कला की योजना बनाएं और सामग्री प्राप्त करें",
             material_desc: "एक आधार छवि अपलोड करें, फिर आप जो अंतिम उत्पाद बनाना चाहते हैं उसका वर्णन करें। हमारा एआई आपकी ज़रूरत की सामग्रियों की एक सूची तैयार करेगा।",
@@ -61,6 +73,17 @@ document.addEventListener('DOMContentLoaded', () => {
             find_suppliers_button: "ऑनलाइन आपूर्तिकर्ता खोजें",
             suppliers_title: "ऑनलाइन आपूर्तिकर्ता",
             listing_button: "लिस्टिंग विवरण बनाएं",
+            suggested_price_title: "मूल्य निर्धारण सुझाव",
+            total_materials: "कुल सामग्री लागत",
+            estimated_labor: "अनुमानित श्रम",
+            profit_margin: "लाभ मार्जिन",
+            selling_price: "सुझाया गया विक्रय मूल्य",
+            per_piece_cost: "प्रति पीस लागत",
+            listing_story_title: "शिल्प के पीछे की कहानी",
+            listing_desc_title: "उत्पाद विवरण",
+            listing_features_title: "मुख्य विशेषताएं",
+            listing_keywords_title: "कीवर्ड",
+            listing_tips_title: "प्लेटफ़ॉर्म युक्तियाँ",
         }
     };
 
@@ -90,23 +113,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const voiceInputBtn = document.getElementById('voice-input-btn');
     const materialResultsContainer = document.getElementById('material-results-container');
     const materialResultsList = document.getElementById('material-results-list');
+    const pricingSummaryContainer = document.getElementById('pricing-summary-container');
     const findSuppliersBtn = document.getElementById('find-suppliers-btn');
     const supplierResultsContainer = document.getElementById('supplier-results-container');
     const supplierResultsList = document.getElementById('supplier-results-list');
-    // New Listing Elements from Upload Section
     const uploadImagePreviewContainer = document.getElementById('upload-image-preview-container');
     const uploadImagePreview = document.getElementById('upload-image-preview');
     const listingFromUploadForm = document.getElementById('listing-from-upload-form');
     const listingDescriptionInput = document.getElementById('listing-description-input');
     const listingResultsContainer = document.getElementById('listing-results-container');
 
-
     // --- State Management ---
     let tipInterval;
     let materialImageB64 = null;
-    let uploadedImageForListingB64 = null; // New state for the upload-listing flow
+    let uploadedImageForListingB64 = null;
     let materialsCache = { en: null, hi: null };
+    let suppliersCache = { en: null, hi: null };
+    let listingCache = { en: null, hi: null };
     let isMaterialRequestActive = false;
+    let isSuppliersRequestActive = false;
+    let isListingRequestActive = false;
     const artisanTips = {
         en: ["Photograph your work in natural light to capture true colors.", "Tell the story behind your craft. Buyers love connecting with the creator.", "Use social media to showcase your creative process, not just the final product."],
         hi: ["सच्चे रंगों को पकड़ने के लिए अपने काम की तस्वीर प्राकृतिक रोशनी में लें।", "अपनी कला के पीछे की कहानी बताएं। खरीदारों को निर्माता से जुड़ना पसंद है।", "सिर्फ अंतिम उत्पाद ही नहीं, अपनी रचनात्मक प्रक्रिया को प्रदर्शित करने के लिए सोशल मीडिया का उपयोग करें।"]
@@ -116,16 +142,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const setLanguage = (lang) => {
         document.querySelectorAll('[data-key]').forEach(elem => {
             const key = elem.getAttribute('data-key');
-            if (translations[lang][key]) elem.textContent = translations[lang][key];
+            if (translations[lang] && translations[lang][key]) elem.textContent = translations[lang][key];
         });
         document.querySelectorAll('[data-key-placeholder]').forEach(elem => {
             const key = elem.getAttribute('data-key-placeholder');
-            if (translations[lang][key]) elem.placeholder = translations[lang][key];
+            if (translations[lang] && translations[lang][key]) elem.placeholder = translations[lang][key];
         });
         localStorage.setItem('language', lang);
         document.documentElement.lang = lang;
+
         if (isMaterialRequestActive && materialsCache[lang]) {
-            displayMaterials(materialsCache[lang]);
+            displayMaterials(materialsCache[lang].materials);
+            displayPricingSummary(materialsCache[lang].pricing, lang);
+        }
+        if (isSuppliersRequestActive && suppliersCache[lang]) {
+            displaySuppliers(suppliersCache[lang]);
+        }
+        if (isListingRequestActive && listingCache[lang]) {
+            displayListingInfo(listingCache[lang], listingResultsContainer, lang);
         }
     };
     languageSwitch.addEventListener('change', (e) => setLanguage(e.target.checked ? 'hi' : 'en'));
@@ -203,7 +237,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data && data.image) displayImages([data.image], editGallery, true);
     });
 
-    // UPDATED: This now handles the new Listing from Upload workflow
     uploadImageInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -214,28 +247,29 @@ document.addEventListener('DOMContentLoaded', () => {
             uploadImagePreview.src = base64StringWithData;
             uploadImagePreviewContainer.classList.remove('hidden');
             listingFromUploadForm.classList.remove('hidden');
-            listingResultsContainer.classList.add('hidden'); // Hide old results
+            listingResultsContainer.innerHTML = '';
+            listingResultsContainer.classList.add('hidden');
         };
         reader.readAsDataURL(file);
     });
     
-    // NEW: Event listener for the new form in the upload section
     listingFromUploadForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!uploadedImageForListingB64 || !listingDescriptionInput.value) {
-            alert('Please upload an image and provide a description.');
-            return;
-        }
-        const body = {
-            image_data: uploadedImageForListingB64,
-            description: listingDescriptionInput.value
-        };
-        const listingData = await performApiCall('/generate-product-listing', body, listingResultsContainer);
-        if (listingData) {
-            displayListingInfo(listingData, listingResultsContainer);
+        if (!uploadedImageForListingB64 || !listingDescriptionInput.value) { alert('Please upload an image and provide a description.'); return; }
+        
+        isListingRequestActive = false;
+        listingCache = { en: null, hi: null };
+
+        const body = { image_data: uploadedImageForListingB64, description: listingDescriptionInput.value };
+        const data = await performApiCall('/generate-product-listing', body, listingResultsContainer);
+        if (data && data.listing) {
+            listingCache.en = data.listing.en;
+            listingCache.hi = data.listing.hi;
+            isListingRequestActive = true;
+            const lang = localStorage.getItem('language') || 'en';
+            displayListingInfo(listingCache[lang], listingResultsContainer, lang);
         }
     });
-
 
     materialImageInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
@@ -267,25 +301,46 @@ document.addEventListener('DOMContentLoaded', () => {
     materialForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!materialImageB64 || !materialDescriptionInput.value) { alert('Please upload an image and provide a description.'); return; }
+        
+        isMaterialRequestActive = false;
+        materialsCache = { en: null, hi: null };
+        isSuppliersRequestActive = false;
+        suppliersCache = { en: null, hi: null };
+        
         findSuppliersBtn.classList.add('hidden');
         supplierResultsContainer.classList.add('hidden');
+        pricingSummaryContainer.innerHTML = '';
+
         const lang = localStorage.getItem('language') || 'en';
         const body = { image_data: materialImageB64, description: materialDescriptionInput.value };
         const data = await performApiCall('/get-materials-all-langs', body, materialResultsList);
+        
         if (data && data.materials) {
             materialsCache.en = data.materials.en;
             materialsCache.hi = data.materials.hi;
             isMaterialRequestActive = true;
-            displayMaterials(materialsCache[lang]);
+            const currentData = materialsCache[lang];
+            displayMaterials(currentData.materials);
+            displayPricingSummary(currentData.pricing, lang);
         }
     });
 
     findSuppliersBtn.addEventListener('click', async () => {
-        const materials = materialsCache[localStorage.getItem('language') || 'en'];
+        const lang = localStorage.getItem('language') || 'en';
+        const materials = materialsCache[lang]?.materials;
         if (!materials || materials.length === 0) return;
         const materialNames = materials.map(item => item.material);
-        const supplierData = await performApiCall('/find-suppliers', { materials: materialNames }, supplierResultsList);
-        if (supplierData) displaySuppliers(supplierData);
+
+        isSuppliersRequestActive = false;
+        suppliersCache = { en: null, hi: null };
+
+        const data = await performApiCall('/find-suppliers', { materials: materialNames }, supplierResultsList);
+        if (data && data.suppliers) {
+            suppliersCache.en = data.suppliers.en;
+            suppliersCache.hi = data.suppliers.hi;
+            isSuppliersRequestActive = true;
+            displaySuppliers(suppliersCache[lang]);
+        }
     });
     
     // --- UI Display Functions ---
@@ -296,12 +351,45 @@ document.addEventListener('DOMContentLoaded', () => {
         ul.className = 'materials-list';
         materials.forEach(item => {
             const li = document.createElement('li');
-            li.innerHTML = `<strong>${item.material}</strong> (Qty: ${item.quantity})<br><em>${item.reason}</em>`;
+            li.innerHTML = `
+                <div class="material-info">
+                    <strong>${item.material}</strong> (Qty: ${item.quantity})
+                    <em>${item.reason}</em>
+                </div>
+                <div class="material-cost">
+                    ₹${item.estimated_cost_inr}
+                </div>
+            `;
             ul.appendChild(li);
         });
         materialResultsList.appendChild(ul);
         materialResultsContainer.classList.remove('hidden');
         findSuppliersBtn.classList.remove('hidden');
+    };
+    
+    // REWRITTEN to be more robust
+    const displayPricingSummary = (pricing, lang) => {
+        pricingSummaryContainer.innerHTML = '';
+        if (!pricing) return;
+        const text = translations[lang];
+
+        const priceRange = (pricing.suggested_price_range_inr && Array.isArray(pricing.suggested_price_range_inr) && pricing.suggested_price_range_inr.length === 2)
+            ? pricing.suggested_price_range_inr
+            : [0, 0];
+
+        pricingSummaryContainer.innerHTML = `
+            <h4 data-key="suggested_price_title">${text.suggested_price_title}</h4>
+            <div class="pricing-grid">
+                <span>${text.total_materials}:</span> <strong>₹${pricing.total_material_cost || 0}</strong>
+                <span>${text.estimated_labor}:</span> <strong>₹${pricing.estimated_labor_inr || 0}</strong>
+                <span>${text.profit_margin}:</span> <strong>${pricing.profit_margin_percent || 0}%</strong>
+                <span>${text.per_piece_cost} (${pricing.units_per_batch || 1} units):</span> <strong>₹${pricing.cost_per_piece_inr || 0}</strong>
+            </div>
+            <div class="final-price">
+                <span>${text.selling_price}:</span>
+                <strong>₹${priceRange[0]} - ₹${priceRange[1]}</strong>
+            </div>
+        `;
     };
 
     const displaySuppliers = (suppliers) => {
@@ -319,25 +407,38 @@ document.addEventListener('DOMContentLoaded', () => {
         supplierResultsContainer.classList.remove('hidden');
     };
 
-    const displayListingInfo = (data, container) => {
+    // REWRITTEN to be more robust and fix bugs
+    const displayListingInfo = (data, container, lang) => {
         container.innerHTML = '';
-        if (!data) return;
-        const featuresHTML = '<ul>' + data.features.map(f => `<li>${f}</li>`).join('') + '</ul>';
-        const keywordsHTML = `<p class="keywords-list"><strong>Keywords:</strong> ${data.keywords.join(', ')}</p>`;
+        if (!data) {
+            container.innerHTML = '<p class="error">Error: Could not generate listing data.</p>';
+            container.classList.remove('hidden');
+            return;
+        }
+        const text = translations[lang];
+
+        const features = Array.isArray(data.features) ? data.features : [];
+        const featuresHTML = '<ul>' + features.map(f => `<li>${String(f)}</li>`).join('') + '</ul>';
+        
+        const keywords = Array.isArray(data.keywords) ? data.keywords : [];
+        const keywordsHTML = `<p class="keywords-list"><strong data-key="listing_keywords_title">${text.listing_keywords_title}:</strong> ${keywords.join(', ')}</p>`;
+        
+        const tips = data.platform_tips || {};
         const tipsHTML = `
-            <h4>Platform Tips</h4>
+            <h4>${text.listing_tips_title}</h4>
             <div class="platform-tips">
-                <div><strong>Amazon Karigar:</strong><p>${data.platform_tips.amazon_karigar}</p></div>
-                <div><strong>Flipkart Samarth:</strong><p>${data.platform_tips.flipkart_samarth}</p></div>
-                <div><strong>ONDC:</strong><p>${data.platform_tips.ondc}</p></div>
+                <div><strong>Amazon Karigar:</strong><p>${tips.amazon_karigar || ''}</p></div>
+                <div><strong>Flipkart Samarth:</strong><p>${tips.flipkart_samarth || ''}</p></div>
+                <div><strong>ONDC:</strong><p>${tips.ondc || ''}</p></div>
             </div>`;
+            
         container.innerHTML = `
-            <h3>${data.title}</h3>
-            <h4>The Story Behind the Craft</h4>
-            <p>${data.story.replace(/\n/g, '<br>')}</p>
-            <h4>Product Description</h4>
-            <p>${data.description.replace(/\n/g, '<br>')}</p>
-            <h4>Key Features</h4>
+            <h3>${data.title || ''}</h3>
+            <h4>${text.listing_story_title}</h4>
+            <p>${(data.story || '').replace(/\n/g, '<br>')}</p>
+            <h4>${text.listing_desc_title}</h4>
+            <p>${(data.description || '').replace(/\n/g, '<br>')}</p>
+            <h4>${text.listing_features_title}</h4>
             ${featuresHTML}
             ${keywordsHTML}
             ${tipsHTML}`;

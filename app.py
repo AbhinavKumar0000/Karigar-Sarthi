@@ -169,13 +169,27 @@ def get_materials_all_langs():
         image_bytes = base64.b64decode(image_b64)
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
         model = GenerativeModel("gemini-2.5-pro")
-        en_prompt = f"Analyze the image and user's goal ('{user_description}') to list raw materials. Return ONLY a valid JSON array of objects with 'material', 'quantity', 'reason' keys in English."
+
+        # UPDATED PROMPT to ask for cost range and per-piece info
+        en_prompt = f"""
+            You are an expert artisan and cost estimator in India. Analyze the image and the user's description to generate a list of raw materials and a pricing suggestion.
+            User's goal: "{user_description}"
+            Return ONLY a valid JSON object with two keys: "materials" and "pricing".
+            1. The "materials" key should be a JSON array where each object has "material", "quantity", "reason", and "estimated_cost_inr" keys.
+            2. The "pricing" key should be a JSON object with "total_material_cost", "estimated_labor_inr", "profit_margin_percent", "suggested_price_range_inr" (a two-element array of numbers [min, max]), "cost_per_piece_inr" (a number), and "units_per_batch" (a number).
+        """
         en_response = model.generate_content([image_part, en_prompt])
-        en_materials_list = json.loads(extract_json_from_response(en_response.text))
-        hi_prompt = f"Translate 'material' and 'reason' in this JSON to Hindi. Do not translate quantity. Return ONLY the translated JSON array. Original: {json.dumps(en_materials_list)}"
+        en_data = json.loads(extract_json_from_response(en_response.text))
+
+        hi_prompt = f"""
+            You are an expert translator. Translate the 'material' and 'reason' values in the following JSON from English to Hindi.
+            Do not translate any other keys or any number values. Return ONLY the translated valid JSON object in the same structure.
+            Original JSON: {json.dumps(en_data)}
+        """
         hi_response = model.generate_content(hi_prompt)
-        hi_materials_list = json.loads(extract_json_from_response(hi_response.text))
-        return jsonify({"materials": {"en": en_materials_list, "hi": hi_materials_list}})
+        hi_data = json.loads(extract_json_from_response(hi_response.text))
+
+        return jsonify({"materials": {"en": en_data, "hi": hi_data}})
     except Exception as e:
         return jsonify({"error": "Failed to get materials.", "details": f"{type(e).__name__}: {str(e)}"}), 500
 
@@ -187,17 +201,24 @@ def find_suppliers():
         materials = data.get('materials')
         if not materials: return jsonify({"error": "No materials provided"}), 400
         model = GenerativeModel("gemini-2.5-pro")
-        # UPDATED PROMPT for more accuracy
-        prompt = f"""
+
+        en_prompt = f"""
         You are a procurement expert for Indian artisans. For the materials list: "{', '.join(materials)}", find online suppliers in India.
         For each material, generate a DIRECT SEARCH URL to a major e-commerce site like Amazon.in, Flipkart, or a specialty craft store.
-        For example, for 'Terracotta Clay', the link should be 'https://www.amazon.in/s?k=terracotta+clay+for+crafts', not just 'https://www.amazon.in'.
-        
         Return ONLY a valid JSON array of objects with "material", "supplier", "link", and "notes" keys. Ensure the link is a functional search URL.
         """
-        response = model.generate_content(prompt)
-        suppliers_list = json.loads(extract_json_from_response(response.text))
-        return jsonify(suppliers_list)
+        en_response = model.generate_content(en_prompt)
+        en_suppliers = json.loads(extract_json_from_response(en_response.text))
+
+        hi_prompt = f"""
+            You are an expert translator. For each object in the following JSON array, translate the 'notes' value from English to Hindi.
+            Do not translate any other keys or values. Return ONLY the translated valid JSON array in the same structure.
+            Original JSON: {json.dumps(en_suppliers)}
+        """
+        hi_response = model.generate_content(hi_prompt)
+        hi_suppliers = json.loads(extract_json_from_response(hi_response.text))
+
+        return jsonify({"suppliers": {"en": en_suppliers, "hi": hi_suppliers}})
     except Exception as e:
         return jsonify({"error": "Failed to find suppliers.", "details": f"{type(e).__name__}: {str(e)}"}), 500
 
@@ -207,8 +228,7 @@ def generate_product_listing():
     try:
         data = request.get_json()
         image_b64 = data.get('image_data')
-        # UPDATED to use 'description' from user instead of 'prompt'
-        user_description = data.get('description', 'a handcrafted item') 
+        user_description = data.get('description', 'a handcrafted item')
         if not image_b64:
             return jsonify({"error": "Missing image data"}), 400
 
@@ -216,24 +236,31 @@ def generate_product_listing():
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
         model = GenerativeModel("gemini-2.5-pro")
 
-        # UPDATED PROMPT to use the user's description
-        listing_prompt = f"""
+        # UPDATED PROMPT to be more robust and clear about return types.
+        en_listing_prompt = f"""
         You are an e-commerce expert for Indian artisans. An artisan has uploaded an image of their product and described it as: "{user_description}".
-        Analyze the image and the description to generate a complete product listing kit. The tone must be authentic and appealing.
-        
+        Analyze the image and description to generate a product listing kit.
         Return ONLY a single, valid JSON object with these keys: "title", "story", "description", "features", "keywords", "platform_tips".
-        - "title": An SEO-friendly title (max 80 chars).
-        - "story": A compelling "Story Behind the Craft" (2 paragraphs).
-        - "description": A detailed product description (3 paragraphs).
-        - "features": A JSON array of 5-7 key feature bullet points.
-        - "keywords": A JSON array of 10-15 SEO keywords.
-        - "platform_tips": A JSON object with string tips for "amazon_karigar", "flipkart_samarth", and "ondc".
+        - "title": A string (max 80 chars).
+        - "story": A string (2 paragraphs).
+        - "description": A string (3 paragraphs).
+        - "features": A JSON array of 5-7 strings.
+        - "keywords": A JSON array of 10-15 strings.
+        - "platform_tips": A JSON object where keys are "amazon_karigar", "flipkart_samarth", "ondc" and values are strings.
         """
-        listing_response = model.generate_content([image_part, listing_prompt])
-        listing_data = json.loads(extract_json_from_response(listing_response.text))
+        en_listing_response = model.generate_content([image_part, en_listing_prompt])
+        en_listing_data = json.loads(extract_json_from_response(en_listing_response.text))
 
-        return jsonify(listing_data)
+        hi_listing_prompt = f"""
+            You are an expert translator. Translate the string values for keys 'title', 'story', 'description' in the JSON object.
+            Also translate the string values inside the 'features' array and inside the 'platform_tips' object.
+            Do not translate the 'keywords' array or any keys. Return ONLY the translated valid JSON object in the same structure.
+            Original JSON: {json.dumps(en_listing_data)}
+        """
+        hi_listing_response = model.generate_content(hi_listing_prompt)
+        hi_listing_data = json.loads(extract_json_from_response(hi_listing_response.text))
 
+        return jsonify({"listing": {"en": en_listing_data, "hi": hi_listing_data}})
     except Exception as e:
         return jsonify({"error": "Failed to generate product listing.", "details": f"{type(e).__name__}: {str(e)}"}), 500
 
