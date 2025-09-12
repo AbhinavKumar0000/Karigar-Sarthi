@@ -3,8 +3,8 @@
     --primary-hover: #357abd;
     --secondary-color: #28a745;
     --secondary-hover: #218838;
-    --tertiary-color: #8a4a_e2; /* New color for listing button */
-    --tertiary-hover: #7335_bf; /* New */
+    --tertiary-color: #8a4ae2;
+    --tertiary-hover: #7335bf;
     --background-color: #f4f7f6;
     --text-color: #333;
     --card-bg: #ffffff;
@@ -87,26 +87,8 @@ header h1 {
 }
 
 .switch input { opacity: 0; width: 0; height: 0; }
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 20px;
-    width: 20px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-}
-
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; }
+.slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; }
 input:checked + .slider { background-color: var(--primary-hover); }
 input:checked + .slider:before { transform: translateX(22px); }
 .slider.round { border-radius: 34px; }
@@ -116,14 +98,6 @@ input:checked + .slider:before { transform: translateX(22px); }
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
-}
-
-#upload-section {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
 }
 
 .workflow-section {
@@ -183,135 +157,69 @@ button:hover, .upload-btn:hover {
     gap: 1rem;
     min-height: 230px;
 }
+.image-gallery.single-image { grid-template-columns: minmax(250px, 400px); justify-content: center; }
+.image-gallery img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 4px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; }
+.image-gallery img:hover { transform: scale(1.03); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+.image-gallery .selected { border-color: var(--primary-color); box-shadow: 0 0 15px rgba(74, 144, 226, 0.5); transform: scale(1.05); }
 
-.image-gallery.single-image {
-    grid-template-columns: minmax(250px, 400px);
-    justify-content: center;
-}
-
-.image-gallery img {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: 4px;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.image-gallery img:hover {
-    transform: scale(1.03);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.image-gallery .selected {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 15px rgba(74, 144, 226, 0.5);
-    transform: scale(1.05);
-}
-
-.selected-image-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.selected-image-container img {
-    max-width: 150px;
-    border-radius: 4px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border-color);
-}
+.selected-image-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+.selected-image-container img { max-width: 150px; border-radius: 4px; box-shadow: var(--shadow); border: 1px solid var(--border-color); }
 
 .hidden { display: none !important; }
 
-#tips-loader {
-    position: fixed; top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(255, 255, 255, 0.9);
-    display: flex; justify-content: center; align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(5px);
-}
-
+#tips-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
 .tip-content { text-align: center; max-width: 500px; padding: 2rem; }
 #tip-text { font-size: 1.25rem; font-weight: 300; color: #555; margin-top: 1.5rem; animation: fadeIn 0.5s ease-in-out; }
 .spinner { width: 50px; height: 50px; border: 5px solid rgba(74, 144, 226, 0.2); border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-#material-description-input { width: 100%; min-height: 120px; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem; resize: vertical; }
-.material-description-area #material-form { display: block; }
-.material-description-area .form-controls { display: flex; gap: 1rem; margin-top: 1rem; }
-
-#material-results-container, #listing-info-container {
-    margin-top: 2rem;
-    padding: 1.5rem;
-    background-color: #f8f9fa;
-    border-radius: 4px;
+textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 0.75rem;
     border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    resize: vertical;
+    font-family: 'Poppins', sans-serif;
 }
 
+#material-form, #listing-from-upload-form {
+    display: block;
+    margin-top: 1rem;
+}
+
+.material-description-area .form-controls { display: flex; gap: 1rem; margin-top: 1rem; }
+
+#material-results-container, #listing-results-container { margin-top: 2rem; padding: 1.5rem; background-color: #f8f9fa; border-radius: 4px; border: 1px solid var(--border-color); }
 .materials-list, .suppliers-list { list-style-type: none; padding-left: 0; }
 .materials-list li, .suppliers-list li { padding: 1rem; border-bottom: 1px solid var(--border-color); }
 .materials-list li:last-child, .suppliers-list li:last-child { border-bottom: none; }
 .materials-list strong { color: var(--primary-color); }
-
 #find-suppliers-btn { margin-top: 1.5rem; background-color: var(--secondary-color); width: 100%; font-weight: 600; }
 #find-suppliers-btn:hover { background-color: var(--secondary-hover); }
 
-/* --- NEW STYLES for Listing Feature --- */
-#generate-listing-btn {
+/* --- STYLES for Listing Feature --- */
+#listing-from-upload-form button {
     background-color: var(--tertiary-color);
-    font-weight: 600;
+    width: 100%;
+    margin-top: 1rem;
 }
-#generate-listing-btn:hover {
+#listing-from-upload-form button:hover {
     background-color: var(--tertiary-hover);
 }
-
-#listing-info-container {
+#listing-results-container {
     text-align: left;
 }
-#listing-info-container h3 {
-    color: var(--text-color);
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-}
-#listing-info-container h4 {
-    margin-top: 1.5rem;
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 0.25rem;
-    margin-bottom: 0.75rem;
-}
-#listing-info-container p {
-    margin-bottom: 1rem;
-}
-#listing-info-container ul {
-    list-style-position: inside;
-    padding-left: 0.5rem;
-    margin-bottom: 1rem;
-}
-#listing-info-container li {
-    margin-bottom: 0.5rem;
-}
-.keywords-list {
-    font-style: italic;
-    color: #555;
-    font-size: 0.9rem;
-}
-.platform-tips div {
-    margin-bottom: 1rem;
-    padding-left: 1rem;
-    border-left: 3px solid var(--secondary-color);
-}
-.platform-tips p {
-    margin-top: 0.25rem;
-    margin-bottom: 0;
-    color: #555;
-}
-/* --- END NEW STYLES --- */
+#listing-results-container h3 { color: var(--text-color); font-size: 1.5rem; margin-bottom: 1rem; }
+#listing-results-container h4 { margin-top: 1.5rem; border-bottom: 2px solid var(--border-color); padding-bottom: 0.25rem; margin-bottom: 0.75rem; }
+#listing-results-container p { margin-bottom: 1rem; }
+#listing-results-container ul { list-style-position: inside; padding-left: 0.5rem; margin-bottom: 1rem; }
+#listing-results-container li { margin-bottom: 0.5rem; }
+.keywords-list { font-style: italic; color: #555; font-size: 0.9rem; }
+.platform-tips div { margin-bottom: 1rem; padding-left: 1rem; border-left: 3px solid var(--secondary-color); }
+.platform-tips p { margin-top: 0.25rem; margin-bottom: 0; color: #555; }
 
 @media (max-width: 768px) {
     header { flex-direction: column; gap: 1rem; padding: 1rem; }

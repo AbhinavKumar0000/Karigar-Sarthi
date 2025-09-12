@@ -9,9 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
             idea_desc: "Describe your concept, and our AI will generate four unique designs inspired by diverse Indian aesthetics.",
             idea_placeholder: "e.g., 'a wooden elephant toy', 'a terracotta Diya'",
             idea_button: "Generate Designs",
-            upload_title: "2. Upload & Edit an Image",
-            upload_desc: "Have a photo already? Upload it here to start editing or generate different angles.",
+            upload_title: "2. Create Listing from Image",
+            upload_desc: "Upload a photo of your finished craft, describe it, and we'll generate all the details for your online store.",
             upload_button: "Upload Your Image",
+            listing_from_upload_placeholder: "Briefly describe your product. e.g., 'Hand-painted wooden coasters with Madhubani art, set of 4.'",
             results_title: "Generated Designs",
             results_desc: "Click an image to select it for the next steps.",
             angle_title: "Generate Different Angles",
@@ -29,9 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
             material_results_title: "Suggested Materials",
             find_suppliers_button: "Find Online Suppliers",
             suppliers_title: "Online Suppliers",
-            listing_title: "Create Product Listing", // New
-            listing_desc: "Generate a title, story, and description to sell your product online.", // New
-            listing_button: "Generate Listing Details", // New
+            listing_button: "Generate Listing Details",
         },
         hi: {
             main_title: "कारीगर-सारथी",
@@ -41,9 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
             idea_desc: "अपनी अवधारणा का वर्णन करें, और हमारा एआई विविध भारतीय सौंदर्यशास्त्र से प्रेरित चार अद्वितीय डिजाइन तैयार करेगा।",
             idea_placeholder: "उदा., 'लकड़ी का हाथी खिलौना', 'मिट्टी का दीया'",
             idea_button: "डिज़ाइन बनाएं",
-            upload_title: "२. एक छवि अपलोड और संपादित करें",
-            upload_desc: "क्या आपके पास पहले से कोई तस्वीर है? संपादन शुरू करने या अलग-अलग एंगल बनाने के लिए इसे यहां अपलोड करें।",
+            upload_title: "२. छवि से लिस्टिंग बनाएं",
+            upload_desc: "अपने तैयार शिल्प की एक तस्वीर अपलोड करें, उसका वर्णन करें, और हम आपके ऑनलाइन स्टोर के लिए सभी विवरण तैयार करेंगे।",
             upload_button: "अपनी छवि अपलोड करें",
+            listing_from_upload_placeholder: "अपने उत्पाद का संक्षिप्त विवरण दें। जैसे, 'मधुबनी कला के साथ हाथ से पेंट किए गए लकड़ी के कोस्टर, 4 का सेट।'",
             results_title: "बनाए गए डिज़ाइन",
             results_desc: "अगले चरणों के लिए इसे चुनने के लिए एक छवि पर क्लिक करें।",
             angle_title: "अलग-अलग एंगल बनाएं",
@@ -51,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
             angle_button: "४ एंगल बनाएं",
             edit_title: "अपना डिज़ाइन संपादित करें",
             edit_desc: "अपनी छवि को परिष्कृत करें। चयनित फ़ोटो में आप जो परिवर्तन करना चाहते हैं, उनका वर्णन करें।",
-            edit_placeholder: "उदा., 'पृष्ठभूमि को नीला बनाएं'",
             edit_button: "संपादन लागू करें",
             material_title: "३. अपनी कला की योजना बनाएं और सामग्री प्राप्त करें",
             material_desc: "एक आधार छवि अपलोड करें, फिर आप जो अंतिम उत्पाद बनाना चाहते हैं उसका वर्णन करें। हमारा एआई आपकी ज़रूरत की सामग्रियों की एक सूची तैयार करेगा।",
@@ -61,9 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
             material_results_title: "सुझाई गई सामग्रियां",
             find_suppliers_button: "ऑनलाइन आपूर्तिकर्ता खोजें",
             suppliers_title: "ऑनलाइन आपूर्तिकर्ता",
-            listing_title: "उत्पाद सूची बनाएं", // New
-            listing_desc: "अपने उत्पाद को ऑनलाइन बेचने के लिए एक शीर्षक, कहानी और विवरण तैयार करें।", // New
-            listing_button: "लिस्टिंग विवरण बनाएं", // New
+            listing_button: "लिस्टिंग विवरण बनाएं",
         }
     };
 
@@ -96,15 +93,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const findSuppliersBtn = document.getElementById('find-suppliers-btn');
     const supplierResultsContainer = document.getElementById('supplier-results-container');
     const supplierResultsList = document.getElementById('supplier-results-list');
-    // New Listing Elements
-    const listingSection = document.getElementById('listing-section');
-    const selectedImageForListing = document.getElementById('selected-image-for-listing');
-    const generateListingBtn = document.getElementById('generate-listing-btn');
-    const listingInfoContainer = document.getElementById('listing-info-container');
+    // New Listing Elements from Upload Section
+    const uploadImagePreviewContainer = document.getElementById('upload-image-preview-container');
+    const uploadImagePreview = document.getElementById('upload-image-preview');
+    const listingFromUploadForm = document.getElementById('listing-from-upload-form');
+    const listingDescriptionInput = document.getElementById('listing-description-input');
+    const listingResultsContainer = document.getElementById('listing-results-container');
+
 
     // --- State Management ---
     let tipInterval;
     let materialImageB64 = null;
+    let uploadedImageForListingB64 = null; // New state for the upload-listing flow
     let materialsCache = { en: null, hi: null };
     let isMaterialRequestActive = false;
     const artisanTips = {
@@ -203,16 +203,39 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data && data.image) displayImages([data.image], editGallery, true);
     });
 
+    // UPDATED: This now handles the new Listing from Upload workflow
     uploadImageInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
         reader.onloadend = () => {
-            const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
-            handleImageSelection(base64String, null);
+            const base64StringWithData = reader.result;
+            uploadedImageForListingB64 = base64StringWithData.replace('data:', '').replace(/^.+,/, '');
+            uploadImagePreview.src = base64StringWithData;
+            uploadImagePreviewContainer.classList.remove('hidden');
+            listingFromUploadForm.classList.remove('hidden');
+            listingResultsContainer.classList.add('hidden'); // Hide old results
         };
         reader.readAsDataURL(file);
     });
+    
+    // NEW: Event listener for the new form in the upload section
+    listingFromUploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!uploadedImageForListingB64 || !listingDescriptionInput.value) {
+            alert('Please upload an image and provide a description.');
+            return;
+        }
+        const body = {
+            image_data: uploadedImageForListingB64,
+            description: listingDescriptionInput.value
+        };
+        const listingData = await performApiCall('/generate-product-listing', body, listingResultsContainer);
+        if (listingData) {
+            displayListingInfo(listingData, listingResultsContainer);
+        }
+    });
+
 
     materialImageInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
@@ -264,19 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const supplierData = await performApiCall('/find-suppliers', { materials: materialNames }, supplierResultsList);
         if (supplierData) displaySuppliers(supplierData);
     });
-
-    // --- NEW: Generate Listing Event Listener ---
-    generateListingBtn.addEventListener('click', async () => {
-        const imageB64 = selectedImageForListing.dataset.b64;
-        if (!imageB64) return;
-        const originalPrompt = ideaPromptInput.value; // Use initial prompt for context
-        const body = { image_data: imageB64, prompt: originalPrompt };
-        const listingData = await performApiCall('/generate-product-listing', body, listingInfoContainer);
-        if (listingData) {
-            displayListingInfo(listingData);
-        }
-    });
-
+    
     // --- UI Display Functions ---
     const displayMaterials = (materials) => {
         materialResultsList.innerHTML = '';
@@ -308,9 +319,8 @@ document.addEventListener('DOMContentLoaded', () => {
         supplierResultsContainer.classList.remove('hidden');
     };
 
-    // --- NEW: Display Listing Info Function ---
-    const displayListingInfo = (data) => {
-        listingInfoContainer.innerHTML = '';
+    const displayListingInfo = (data, container) => {
+        container.innerHTML = '';
         if (!data) return;
         const featuresHTML = '<ul>' + data.features.map(f => `<li>${f}</li>`).join('') + '</ul>';
         const keywordsHTML = `<p class="keywords-list"><strong>Keywords:</strong> ${data.keywords.join(', ')}</p>`;
@@ -321,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div><strong>Flipkart Samarth:</strong><p>${data.platform_tips.flipkart_samarth}</p></div>
                 <div><strong>ONDC:</strong><p>${data.platform_tips.ondc}</p></div>
             </div>`;
-        listingInfoContainer.innerHTML = `
+        container.innerHTML = `
             <h3>${data.title}</h3>
             <h4>The Story Behind the Craft</h4>
             <p>${data.story.replace(/\n/g, '<br>')}</p>
@@ -331,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ${featuresHTML}
             ${keywordsHTML}
             ${tipsHTML}`;
-        listingInfoContainer.classList.remove('hidden');
+        container.classList.remove('hidden');
     };
 
     const displayImages = (images, galleryElement, allowSelection) => {
@@ -348,38 +358,29 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const handleImageSelection = (base64, galleryElement, selectedImgElement = null) => {
-        // Populate all sections that use the selected image
         const imgSrc = `data:image/png;base64,${base64}`;
         selectedImageForAngles.src = imgSrc;
         selectedImageForAngles.dataset.b64 = base64;
         selectedImageForEdit.src = imgSrc;
         selectedImageForEdit.dataset.b64 = base64;
-        selectedImageForListing.src = imgSrc; // New
-        selectedImageForListing.dataset.b64 = base64; // New
         
         if(galleryElement && selectedImgElement) {
             galleryElement.querySelectorAll('img').forEach(img => img.classList.remove('selected'));
             selectedImgElement.classList.add('selected');
         }
         
-        // Show all subsequent action sections
         ideaGallerySection.classList.remove('hidden');
         angleSection.classList.remove('hidden');
         editSection.classList.remove('hidden');
-        listingSection.classList.remove('hidden'); // New
         
-        // Clear previous results in these sections
         angleGallery.innerHTML = '';
         editGallery.innerHTML = '';
-        listingInfoContainer.innerHTML = ''; // New
-        listingInfoContainer.classList.add('hidden'); // New
     };
 
     const hideAllSections = () => {
         ideaGallerySection.classList.add('hidden');
         angleSection.classList.add('hidden');
         editSection.classList.add('hidden');
-        listingSection.classList.add('hidden'); // New
     };
 });
 

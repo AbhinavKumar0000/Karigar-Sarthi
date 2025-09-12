@@ -56,11 +56,9 @@ def login_required(f):
 
 # --- Helper Function ---
 def extract_json_from_response(response_text):
-    # This more robust regex can capture a JSON object {} or array []
     match = re.search(r'```json\s*(.*?)\s*```', response_text, re.DOTALL)
     if match:
         return match.group(1)
-    # Fallback for responses that might not have the markdown block
     match = re.search(r'({.*}|\[.*\])', response_text, re.DOTALL)
     if match:
         return match.group(0)
@@ -189,24 +187,28 @@ def find_suppliers():
         materials = data.get('materials')
         if not materials: return jsonify({"error": "No materials provided"}), 400
         model = GenerativeModel("gemini-2.5-pro")
-        prompt = f"""For these materials: "{', '.join(materials)}", find online suppliers in India. Prioritize sites like Amazon.in or specialty craft stores. Return ONLY a valid JSON array of objects with "material", "supplier", "link", and "notes" keys."""
+        # UPDATED PROMPT for more accuracy
+        prompt = f"""
+        You are a procurement expert for Indian artisans. For the materials list: "{', '.join(materials)}", find online suppliers in India.
+        For each material, generate a DIRECT SEARCH URL to a major e-commerce site like Amazon.in, Flipkart, or a specialty craft store.
+        For example, for 'Terracotta Clay', the link should be 'https://www.amazon.in/s?k=terracotta+clay+for+crafts', not just 'https://www.amazon.in'.
+        
+        Return ONLY a valid JSON array of objects with "material", "supplier", "link", and "notes" keys. Ensure the link is a functional search URL.
+        """
         response = model.generate_content(prompt)
         suppliers_list = json.loads(extract_json_from_response(response.text))
         return jsonify(suppliers_list)
     except Exception as e:
         return jsonify({"error": "Failed to find suppliers.", "details": f"{type(e).__name__}: {str(e)}"}), 500
 
-# --- NEW ROUTE ---
 @app.route('/generate-product-listing', methods=['POST'])
 @login_required
 def generate_product_listing():
-    """
-    Creates a full e-commerce product listing kit based on an image and a user prompt.
-    """
     try:
         data = request.get_json()
         image_b64 = data.get('image_data')
-        original_prompt = data.get('prompt', 'a handcrafted item') 
+        # UPDATED to use 'description' from user instead of 'prompt'
+        user_description = data.get('description', 'a handcrafted item') 
         if not image_b64:
             return jsonify({"error": "Missing image data"}), 400
 
@@ -214,15 +216,10 @@ def generate_product_listing():
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
         model = GenerativeModel("gemini-2.5-pro")
 
-        # First, get a detailed description to feed into the main prompt
-        description_response = model.generate_content([image_part, "You are a master artisan. Describe the object in this image with extreme detail. Mention material, colors, patterns, texture, and craft style."])
-        detailed_description = description_response.text
-
-        # Now, generate the full listing
+        # UPDATED PROMPT to use the user's description
         listing_prompt = f"""
-        You are an e-commerce expert for Indian artisans. An artisan created an item from the idea: "{original_prompt}".
-        The final product is: "{detailed_description}".
-        Generate a complete product listing kit. The tone must be authentic and appealing.
+        You are an e-commerce expert for Indian artisans. An artisan has uploaded an image of their product and described it as: "{user_description}".
+        Analyze the image and the description to generate a complete product listing kit. The tone must be authentic and appealing.
         
         Return ONLY a single, valid JSON object with these keys: "title", "story", "description", "features", "keywords", "platform_tips".
         - "title": An SEO-friendly title (max 80 chars).
@@ -232,14 +229,13 @@ def generate_product_listing():
         - "keywords": A JSON array of 10-15 SEO keywords.
         - "platform_tips": A JSON object with string tips for "amazon_karigar", "flipkart_samarth", and "ondc".
         """
-        listing_response = model.generate_content(listing_prompt)
+        listing_response = model.generate_content([image_part, listing_prompt])
         listing_data = json.loads(extract_json_from_response(listing_response.text))
 
         return jsonify(listing_data)
 
     except Exception as e:
         return jsonify({"error": "Failed to generate product listing.", "details": f"{type(e).__name__}: {str(e)}"}), 500
-
 
 # --- Main Execution ---
 if __name__ == '__main__':
