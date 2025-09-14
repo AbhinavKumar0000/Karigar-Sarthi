@@ -104,8 +104,8 @@ def refine_and_generate_ideas():
         text_model = GenerativeModel("gemini-2.5-pro")
         refinement_instruction = (
              f"You are a creative guide for an Indian artisan. The user's idea is: '{user_prompt}'. "
-            "Reinterpret the idea as a physical artisan craft object. Then, expand it into four distinct, highly detailed prompts for an AI image model, reflecting diverse Indian aesthetics: 1. Vibrant & Festive, 2. Earthy & Rustic, 3. Intricate & Ornate, 4. Modern & Geometric. "
-            'Return ONLY a valid JSON array of 4 strings.'
+             "Reinterpret the idea as a physical artisan craft object. Then, expand it into four distinct, highly detailed prompts for an AI image model, reflecting diverse Indian aesthetics: 1. Vibrant & Festive, 2. Earthy & Rustic, 3. Intricate & Ornate, 4. Modern & Geometric. "
+             'Return ONLY a valid JSON array of 4 strings.'
         )
         response = text_model.generate_content(refinement_instruction)
         refined_prompts = json.loads(extract_json_from_response(response.text))
@@ -170,7 +170,6 @@ def get_materials_all_langs():
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
         model = GenerativeModel("gemini-2.5-pro")
 
-        # UPDATED PROMPT to ask for cost range and per-piece info
         en_prompt = f"""
             You are an expert artisan and cost estimator in India. Analyze the image and the user's description to generate a list of raw materials and a pricing suggestion.
             User's goal: "{user_description}"
@@ -236,7 +235,6 @@ def generate_product_listing():
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
         model = GenerativeModel("gemini-2.5-pro")
 
-        # UPDATED PROMPT to be more robust and clear about return types.
         en_listing_prompt = f"""
         You are an e-commerce expert for Indian artisans. An artisan has uploaded an image of their product and described it as: "{user_description}".
         Analyze the image and description to generate a product listing kit.
@@ -251,12 +249,23 @@ def generate_product_listing():
         en_listing_response = model.generate_content([image_part, en_listing_prompt])
         en_listing_data = json.loads(extract_json_from_response(en_listing_response.text))
 
+        # --- MODIFIED SECTION ---
+        # This prompt is now more explicit to prevent translation errors.
         hi_listing_prompt = f"""
-            You are an expert translator. Translate the string values for keys 'title', 'story', 'description' in the JSON object.
-            Also translate the string values inside the 'features' array and inside the 'platform_tips' object.
-            Do not translate the 'keywords' array or any keys. Return ONLY the translated valid JSON object in the same structure.
-            Original JSON: {json.dumps(en_listing_data)}
+            You are an expert JSON translator. Your task is to translate specific text fields within a JSON object from English to Hindi.
+
+            RULES:
+            1.  Translate ONLY the string values for the following top-level keys: 'title', 'story', 'description'.
+            2.  Translate ONLY the string elements within the 'features' array.
+            3.  In the 'platform_tips' object, translate ONLY the string values associated with the keys, NOT the keys themselves.
+            4.  You MUST NOT translate the 'keywords' array. It must remain in English.
+            5.  You MUST NOT translate any JSON keys.
+            6.  The output must be a single, valid JSON object with the exact same structure as the input.
+
+            Original English JSON:
+            {json.dumps(en_listing_data, indent=2)}
         """
+        # --- END OF MODIFIED SECTION ---
         hi_listing_response = model.generate_content(hi_listing_prompt)
         hi_listing_data = json.loads(extract_json_from_response(hi_listing_response.text))
 
@@ -267,4 +276,3 @@ def generate_product_listing():
 # --- Main Execution ---
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
-
