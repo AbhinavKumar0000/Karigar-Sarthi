@@ -108,9 +108,15 @@ def refine_and_generate_ideas():
              'Return ONLY a valid JSON array of 4 strings.'
         )
         response = text_model.generate_content(refinement_instruction)
-        refined_prompts = json.loads(extract_json_from_response(response.text))
+        refined_prompts_raw = json.loads(extract_json_from_response(response.text))
+        
+        # FIX: Filter out any empty or whitespace-only prompts
+        refined_prompts = [p for p in refined_prompts_raw if p and p.strip()]
+        if not refined_prompts:
+            return jsonify({"error": "Failed to generate valid, non-empty prompts from the idea."}), 500
+
         image_model = ImageGenerationModel.from_pretrained("imagegeneration@006")
-        base64_images = [base64.b64encode(img._image_bytes).decode('utf-8') for img in image_model.generate_images(prompts=refined_prompts)]
+        base64_images = [base64.b64encode(img._image_bytes).decode('utf-8') for img in image_model.generate_images(prompt=refined_prompts)]
         return jsonify({"images": base64_images, "prompts": refined_prompts})
     except Exception as e:
         return jsonify({"error": "Failed to generate ideas.", "details": f"{type(e).__name__}: {str(e)}"}), 500
@@ -127,6 +133,11 @@ def generate_angles():
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
         response = vision_model.generate_content([image_part, "Describe this object in extreme detail for a fellow artisan."])
         image_description = response.text
+        
+        # FIX: Ensure image description is not empty before creating prompts
+        if not image_description or not image_description.strip():
+            return jsonify({"error": "Could not generate a description from the provided image."}), 500
+            
         angle_prompts = [
             f"Side profile photograph of this object: '{image_description}', on a brightly lit white studio background.",
             f"45-degree angle photograph of this object: '{image_description}', on a brightly lit white studio background.",
@@ -134,7 +145,7 @@ def generate_angles():
             f"Lifestyle photograph of this object: '{image_description}', in a culturally relevant Indian setting."
         ]
         image_model = ImageGenerationModel.from_pretrained("imagegeneration@006")
-        base64_images = [base64.b64encode(img._image_bytes).decode('utf-8') for img in image_model.generate_images(prompts=angle_prompts)]
+        base64_images = [base64.b64encode(img._image_bytes).decode('utf-8') for img in image_model.generate_images(prompt=angle_prompts)]
         return jsonify({"images": base64_images})
     except Exception as e:
         return jsonify({"error": "Failed to generate angles.", "details": f"{type(e).__name__}: {str(e)}"}), 500
@@ -151,6 +162,11 @@ def edit_image():
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
         response = vision_model.generate_content([image_part, "Describe this object in extreme detail for an AI image model."])
         image_description = response.text
+        
+        # FIX: Ensure image description is not empty before creating final prompt
+        if not image_description or not image_description.strip():
+            return jsonify({"error": "Could not generate a base description from the image for editing."}), 500
+            
         final_prompt = (f"Edit an image of an artisan object described as: '{image_description}'. Apply this modification ONLY: '{user_edit_prompt}'. Preserve all other details.")
         image_model = ImageGenerationModel.from_pretrained("imagegeneration@006")
         gen_response = image_model.generate_images(prompt=final_prompt, number_of_images=1)
@@ -171,17 +187,16 @@ def get_materials_all_langs():
         model = GenerativeModel("gemini-2.5-pro")
 
         en_prompt = f"""
-            You are an expert artisan and cost estimator in India. Analyze the image and the user's description to generate a list of raw materials and a pricing suggestion.
-            User's goal: "{user_description}"
-            Return ONLY a valid JSON object with two keys: "materials" and "pricing".
-            1. The "materials" key should be a JSON array where each object has "material", "quantity", "reason", and "estimated_cost_inr" keys.
-            2. The "pricing" key should be a JSON object with "total_material_cost", "estimated_labor_inr", "profit_margin_percent", "suggested_price_range_inr" (a two-element array of numbers [min, max]), "cost_per_piece_inr" (a number), and "units_per_batch" (a number).
+            You are an expert artisan and cost estimator in India. Analyze the image and the user's goal: "{user_description}".
+            Return ONLY a valid JSON object with a "materials" and "pricing" key.
+            1.  "materials": An array of objects, each with "material" (string), "quantity" (string), "reason" (string), and "estimated_cost_inr" (number).
+            2.  "pricing": An object with "total_material_cost" (number), "overhead_contingency_percent" (number), "cost_to_make" (number), "units_per_batch" (number), "cost_per_piece_inr" (number), "suggested_wholesale_price_inr" (number), and "suggested_retail_price_range_inr" (array of two numbers [min, max]).
         """
         en_response = model.generate_content([image_part, en_prompt])
         en_data = json.loads(extract_json_from_response(en_response.text))
 
         hi_prompt = f"""
-            You are an expert translator. Translate the 'material' and 'reason' values in the following JSON from English to Hindi.
+            You are an expert translator. Translate the 'material' and 'reason' values in the 'materials' array from English to Hindi.
             Do not translate any other keys or any number values. Return ONLY the translated valid JSON object in the same structure.
             Original JSON: {json.dumps(en_data)}
         """
@@ -199,7 +214,7 @@ def find_suppliers():
         data = request.get_json()
         materials = data.get('materials')
         if not materials: return jsonify({"error": "No materials provided"}), 400
-        model = GenerativeModel("gemini-2.5-pro")
+        model = GenerativeModel("emini-2.5-pro")
 
         en_prompt = f"""
         You are a procurement expert for Indian artisans. For the materials list: "{', '.join(materials)}", find online suppliers in India.
@@ -226,46 +241,40 @@ def find_suppliers():
 def generate_product_listing():
     try:
         data = request.get_json()
-        image_b64 = data.get('image_data')
-        user_description = data.get('description', 'a handcrafted item')
-        if not image_b64:
-            return jsonify({"error": "Missing image data"}), 400
+        image_b64, user_description = data.get('image_data'), data.get('description', 'a handcrafted item')
+        if not image_b64: return jsonify({"error": "Missing image data"}), 400
 
         image_bytes = base64.b64decode(image_b64)
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
         model = GenerativeModel("gemini-2.5-pro")
 
         en_listing_prompt = f"""
-        You are an e-commerce expert for Indian artisans. An artisan has uploaded an image of their product and described it as: "{user_description}".
-        Analyze the image and description to generate a product listing kit.
-        Return ONLY a single, valid JSON object with these keys: "title", "story", "description", "features", "keywords", "platform_tips".
-        - "title": A string (max 80 chars).
-        - "story": A string (2 paragraphs).
-        - "description": A string (3 paragraphs).
-        - "features": A JSON array of 5-7 strings.
-        - "keywords": A JSON array of 10-15 strings.
-        - "platform_tips": A JSON object where keys are "amazon_karigar", "flipkart_samarth", "ondc" and values are strings.
+            You are an e-commerce expert for Indian artisans, specializing in platforms like Amazon Karigar, Flipkart Samarth, and ONDC. An artisan has uploaded an image of their product and described it as: "{user_description}".
+            Analyze the image and description to generate a comprehensive product listing kit.
+            Return ONLY a single, valid JSON object with these exact keys: "title", "story", "description", "features", "keywords", "platform_tips".
+            - "title": A compelling, SEO-friendly string (max 80 chars).
+            - "story": A heartwarming string in 2 paragraphs about the artisan's craft.
+            - "description": A detailed, professional string in 3 paragraphs.
+            - "features": A JSON array of 5-7 concise, benefit-oriented strings.
+            - "keywords": A JSON array of 10-15 relevant search term strings.
+            - "platform_tips": A JSON object where keys are "amazon_karigar", "flipkart_samarth", "ondc" and values are specific, actionable tip strings for that platform.
         """
         en_listing_response = model.generate_content([image_part, en_listing_prompt])
         en_listing_data = json.loads(extract_json_from_response(en_listing_response.text))
 
-        # --- MODIFIED SECTION ---
-        # This prompt is now more explicit to prevent translation errors.
         hi_listing_prompt = f"""
-            You are an expert JSON translator. Your task is to translate specific text fields within a JSON object from English to Hindi.
-
-            RULES:
+            You are an expert English-to-Hindi translator. Your task is to translate specific parts of the following JSON object into Hindi.
+            Follow these rules STRICTLY:
             1.  Translate ONLY the string values for the following top-level keys: 'title', 'story', 'description'.
-            2.  Translate ONLY the string elements within the 'features' array.
-            3.  In the 'platform_tips' object, translate ONLY the string values associated with the keys, NOT the keys themselves.
-            4.  You MUST NOT translate the 'keywords' array. It must remain in English.
-            5.  You MUST NOT translate any JSON keys.
-            6.  The output must be a single, valid JSON object with the exact same structure as the input.
+            2.  Translate ONLY the strings INSIDE the 'features' array.
+            3.  Translate ONLY the string values for the keys INSIDE the 'platform_tips' object.
+            4.  ABSOLUTELY DO NOT translate any of the JSON keys themselves (e.g., "title", "story", "amazon_karigar").
+            5.  ABSOLUTELY DO NOT translate any strings inside the 'keywords' array. Keep them in English.
+            6.  The final output MUST be a single, valid JSON object with the exact same structure as the original. Do not add any extra text, explanations, or code formatting like ```json.
 
             Original English JSON:
-            {json.dumps(en_listing_data, indent=2)}
+            {json.dumps(en_listing_data)}
         """
-        # --- END OF MODIFIED SECTION ---
         hi_listing_response = model.generate_content(hi_listing_prompt)
         hi_listing_data = json.loads(extract_json_from_response(hi_listing_response.text))
 
@@ -276,3 +285,4 @@ def generate_product_listing():
 # --- Main Execution ---
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
+

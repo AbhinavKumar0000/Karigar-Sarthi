@@ -5,38 +5,39 @@ document.addEventListener('DOMContentLoaded', () => {
             main_title: "Karigar-Sarthi",
             subtitle: "Your AI-Powered Digital Workshop",
             lang_en: "EN", lang_hi: "HI",
-            idea_title: "1. Create a New Idea",
-            idea_desc: "Describe your concept, and our AI will generate four unique designs inspired by diverse Indian aesthetics.",
-            idea_placeholder: "e.g., 'a wooden elephant toy', 'a terracotta Diya'",
-            idea_button: "Generate Designs",
-            upload_title: "2. Create Listing from Image",
-            upload_desc: "Upload a photo of your finished craft, describe it, and we'll generate all the details for your online store.",
-            upload_button: "Upload Your Image",
-            listing_from_upload_placeholder: "Briefly describe your product. e.g., 'Hand-painted wooden coasters with Madhubani art, set of 4.'",
-            results_title: "Generated Designs",
-            results_desc: "Click an image to select it for the next steps.",
-            angle_title: "Generate Different Angles",
-            angle_desc: "Create professional product shots for your selected design.",
-            angle_button: "Generate 4 Angles",
-            edit_title: "Edit Your Design",
-            edit_desc: "Describe the changes you want to make to the selected photo.",
-            edit_placeholder: "e.g., 'make the background blue'",
-            edit_button: "Apply Edit",
-            material_title: "3. Plan Your Craft & Get Materials",
-            material_desc: "Upload a base image, then describe the final product you want to create. Our AI will generate a list of materials you'll need.",
-            material_upload_button: "Upload Base Image",
-            material_placeholder: "Describe the final product. For example: 'I want to make this wooden toy, but paint it blue with yellow floral patterns and add small wheels.'",
-            material_button: "Get Materials List",
-            material_results_title: "Suggested Materials",
+            input_title: "Start Here: Describe Your Craft",
+            input_image_title: "1. Provide an Image",
+            upload_button: "Upload from Gallery",
+            camera_button: "Use Camera",
+            input_desc_title: "2. Describe the Product",
+            input_desc_placeholder: "Describe your product or the changes you want to make...",
+            material_button: "Get Materials & Pricing",
+            listing_button: "Generate Listing",
+            material_results_title: "Materials & Pricing Strategy",
+            listing_results_title: "Generated Product Listing",
             find_suppliers_button: "Find Online Suppliers",
             suppliers_title: "Online Suppliers",
-            listing_button: "Generate Listing Details",
-            suggested_price_title: "Pricing Suggestion",
+            idea_title: "Optional: AI Design Studio",
+            idea_desc: "Don't have an idea? Describe a concept, and our AI will generate four unique designs for you.",
+            idea_placeholder: "e.g., 'a wooden elephant toy'",
+            idea_button: "Generate Designs",
+            results_title: "Generated Designs",
+            results_desc: "Click an image to select it or use it as a base for material planning.",
+            angle_title: "Generate Different Angles",
+            angle_button: "Generate 4 Angles",
+            edit_title: "Edit Your Design",
+            edit_placeholder: "e.g., 'make the background blue'",
+            edit_button: "Apply Edit",
+            price_strat_title: "Pricing Strategy",
+            cost_breakdown_title: "Production Cost Breakdown",
             total_materials: "Total Material Cost",
-            estimated_labor: "Estimated Labor",
-            profit_margin: "Profit Margin",
-            selling_price: "Suggested Selling Price",
-            per_piece_cost: "Cost per Piece",
+            overhead: "Overhead/Contingency",
+            cost_to_make: "Total Cost to Make (per batch)",
+            units_per_batch: "Units per Batch",
+            cost_per_piece: "Cost per Piece",
+            pricing_rec_title: "Pricing Recommendations",
+            wholesale_price: "Suggested Wholesale Price",
+            retail_price: "Suggested Retail Price",
             listing_story_title: "The Story Behind the Craft",
             listing_desc_title: "Product Description",
             listing_features_title: "Key Features",
@@ -47,38 +48,39 @@ document.addEventListener('DOMContentLoaded', () => {
             main_title: "कारीगर-सारथी",
             subtitle: "आपकी एआई-संचालित डिजिटल कार्यशाला",
             lang_en: "EN", lang_hi: "HI",
-            idea_title: "१. एक नया विचार बनाएं",
-            idea_desc: "अपनी अवधारणा का वर्णन करें, और हमारा एआई विविध भारतीय सौंदर्यशास्त्र से प्रेरित चार अद्वितीय डिजाइन तैयार करेगा।",
-            idea_placeholder: "उदा., 'लकड़ी का हाथी खिलौना', 'मिट्टी का दीया'",
-            idea_button: "डिज़ाइन बनाएं",
-            upload_title: "२. छवि से लिस्टिंग बनाएं",
-            upload_desc: "अपने तैयार शिल्प की एक तस्वीर अपलोड करें, उसका वर्णन करें, और हम आपके ऑनलाइन स्टोर के लिए सभी विवरण तैयार करेंगे।",
-            upload_button: "अपनी छवि अपलोड करें",
-            listing_from_upload_placeholder: "अपने उत्पाद का संक्षिप्त विवरण दें। जैसे, 'मधुबनी कला के साथ हाथ से पेंट किए गए लकड़ी के कोस्टर, 4 का सेट।'",
-            results_title: "बनाए गए डिज़ाइन",
-            results_desc: "अगले चरणों के लिए इसे चुनने के लिए एक छवि पर क्लिक करें।",
-            angle_title: "अलग-अलग एंगल बनाएं",
-            angle_desc: "आइए आपके चुने हुए डिज़ाइन के लिए अलग-अलग कैमरा एंगल से पेशेवर उत्पाद शॉट्स बनाएं।",
-            angle_button: "४ एंगल बनाएं",
-            edit_title: "अपना डिज़ाइन संपादित करें",
-            edit_desc: "अपनी छवि को परिष्कृत करें। चयनित फ़ोटो में आप जो परिवर्तन करना चाहते हैं, उनका वर्णन करें।",
-            edit_placeholder: "उदा., 'पृष्ठभूमि को नीला बनाएं'",
-            edit_button: "संपादन लागू करें",
-            material_title: "३. अपनी कला की योजना बनाएं और सामग्री प्राप्त करें",
-            material_desc: "एक आधार छवि अपलोड करें, फिर आप जो अंतिम उत्पाद बनाना चाहते हैं उसका वर्णन करें। हमारा एआई आपकी ज़रूरत की सामग्रियों की एक सूची तैयार करेगा।",
-            material_upload_button: "आधार छवि अपलोड करें",
-            material_placeholder: "अंतिम उत्पाद का वर्णन करें। उदाहरण के लिए: 'मैं यह लकड़ी का खिलौना बनाना चाहता हूं...'",
-            material_button: "सामग्री सूची प्राप्त करें",
-            material_results_title: "सुझाई गई सामग्रियां",
+            input_title: "यहां से शुरू करें: अपनी कला का वर्णन करें",
+            input_image_title: "१. एक छवि प्रदान करें",
+            upload_button: "गैलरी से अपलोड करें",
+            camera_button: "कैमरे का प्रयोग करें",
+            input_desc_title: "२. उत्पाद का वर्णन करें",
+            input_desc_placeholder: "अपने उत्पाद या उन परिवर्तनों का वर्णन करें जो आप करना चाहते हैं...",
+            material_button: "सामग्री और मूल्य निर्धारण प्राप्त करें",
+            listing_button: "लिस्टिंग बनाएं",
+            material_results_title: "सामग्री और मूल्य निर्धारण रणनीति",
+            listing_results_title: "उत्पाद लिस्टिंग",
             find_suppliers_button: "ऑनलाइन आपूर्तिकर्ता खोजें",
             suppliers_title: "ऑनलाइन आपूर्तिकर्ता",
-            listing_button: "लिस्टिंग विवरण बनाएं",
-            suggested_price_title: "मूल्य निर्धारण सुझाव",
+            idea_title: "वैकल्पिक: एआई डिजाइन स्टूडियो",
+            idea_desc: "कोई विचार नहीं है? एक अवधारणा का वर्णन करें, और हमारा एआई आपके लिए चार अद्वितीय डिजाइन तैयार करेगा।",
+            idea_placeholder: "उदा., 'लकड़ी का हाथी खिलौना'",
+            idea_button: "डिज़ाइन बनाएं",
+            results_title: "बनाए गए डिज़ाइन",
+            results_desc: "इसे चुनने के लिए एक छवि पर क्लिक करें या सामग्री योजना के लिए आधार के रूप में इसका उपयोग करें।",
+            angle_title: "अलग-अलग एंगल बनाएं",
+            angle_button: "४ एंगल बनाएं",
+            edit_title: "अपना डिज़ाइन संपादित करें",
+            edit_placeholder: "उदा., 'पृष्ठभूमि को नीला बनाएं'",
+            edit_button: "संपादन लागू करें",
+            price_strat_title: "मूल्य निर्धारण रणनीति",
+            cost_breakdown_title: "उत्पादन लागत का विवरण",
             total_materials: "कुल सामग्री लागत",
-            estimated_labor: "अनुमानित श्रम",
-            profit_margin: "लाभ मार्जिन",
-            selling_price: "सुझाया गया विक्रय मूल्य",
-            per_piece_cost: "प्रति पीस लागत",
+            overhead: "ओवरहेड/आकस्मिकता",
+            cost_to_make: "बनाने की कुल लागत (प्रति बैच)",
+            units_per_batch: "प्रति बैच इकाइयाँ",
+            cost_per_piece: "प्रति पीस लागत",
+            pricing_rec_title: "मूल्य निर्धारण सिफारिशें",
+            wholesale_price: "सुझाया गया थोक मूल्य",
+            retail_price: "सुझाया गया खुदरा मूल्य",
             listing_story_title: "शिल्प के पीछे की कहानी",
             listing_desc_title: "उत्पाद विवरण",
             listing_features_title: "मुख्य विशेषताएं",
@@ -89,50 +91,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- DOM Elements ---
     const languageSwitch = document.getElementById('language-switch');
-    const ideaForm = document.getElementById('idea-form');
-    const ideaPromptInput = document.getElementById('idea-prompt-input');
-    const uploadImageInput = document.getElementById('upload-image-input');
-    const ideaGallerySection = document.getElementById('idea-gallery-section');
-    const ideaGallery = document.getElementById('idea-gallery');
-    const angleSection = document.getElementById('angle-section');
-    const editSection = document.getElementById('edit-section');
-    const selectedImageForAngles = document.getElementById('selected-image-for-angles');
-    const generateAnglesBtn = document.getElementById('generate-angles-btn');
-    const angleGallery = document.getElementById('angle-gallery');
-    const selectedImageForEdit = document.getElementById('selected-image-for-edit');
-    const editForm = document.getElementById('edit-form');
-    const editPromptInput = document.getElementById('edit-prompt-input');
-    const editGallery = document.getElementById('edit-gallery');
-    const tipsLoader = document.getElementById('tips-loader');
-    const tipText = document.getElementById('tip-text');
-    const materialImageInput = document.getElementById('material-image-input');
-    const materialImagePreview = document.getElementById('material-image-preview');
-    const materialImagePreviewContainer = document.getElementById('material-image-preview-container');
-    const materialForm = document.getElementById('material-form');
-    const materialDescriptionInput = document.getElementById('material-description-input');
+    const imagePreviewContainer = document.getElementById('image-preview-container');
+    const imagePreview = document.getElementById('image-preview');
+    const uploadInput = document.getElementById('upload-input');
+    const cameraBtn = document.getElementById('camera-btn');
+    const descriptionInput = document.getElementById('description-input');
     const voiceInputBtn = document.getElementById('voice-input-btn');
-    const materialResultsContainer = document.getElementById('material-results-container');
-    const materialResultsList = document.getElementById('material-results-list');
+    const getMaterialsBtn = document.getElementById('get-materials-btn');
+    const getListingBtn = document.getElementById('get-listing-btn');
+    const resultsWrapper = document.getElementById('results-wrapper');
+    const materialsResultsContainer = document.getElementById('materials-results-container');
+    const materialsList = document.getElementById('materials-list');
     const pricingSummaryContainer = document.getElementById('pricing-summary-container');
     const findSuppliersBtn = document.getElementById('find-suppliers-btn');
     const supplierResultsContainer = document.getElementById('supplier-results-container');
     const supplierResultsList = document.getElementById('supplier-results-list');
-    const uploadImagePreviewContainer = document.getElementById('upload-image-preview-container');
-    const uploadImagePreview = document.getElementById('upload-image-preview');
-    const listingFromUploadForm = document.getElementById('listing-from-upload-form');
-    const listingDescriptionInput = document.getElementById('listing-description-input');
     const listingResultsContainer = document.getElementById('listing-results-container');
-
+    const aiStudioSection = document.getElementById('ai-studio-section');
+    const ideaForm = document.getElementById('idea-form');
+    const ideaPromptInput = document.getElementById('idea-prompt-input');
+    const ideaResultsContainer = document.getElementById('results-container');
+    const ideaGallerySection = document.getElementById('idea-gallery-section');
+    const ideaGallery = document.getElementById('idea-gallery');
+    const angleSection = document.getElementById('angle-section');
+    const selectedImageForAngles = document.getElementById('selected-image-for-angles');
+    const generateAnglesBtn = document.getElementById('generate-angles-btn');
+    const angleGallery = document.getElementById('angle-gallery');
+    const editSection = document.getElementById('edit-section');
+    const selectedImageForEdit = document.getElementById('selected-image-for-edit');
+    const editForm = document.getElementById('edit-form');
+    const editPromptInput = document.getElementById('edit-prompt-input');
+    const editGallery = document.getElementById('edit-gallery');
+    const cameraModal = document.getElementById('camera-modal');
+    const cameraFeed = document.getElementById('camera-feed');
+    const cameraCanvas = document.getElementById('camera-canvas');
+    const captureBtn = document.getElementById('capture-btn');
+    const cancelCaptureBtn = document.getElementById('cancel-capture-btn');
+    const tipsLoader = document.getElementById('tips-loader');
+    const tipText = document.getElementById('tip-text');
+    
     // --- State Management ---
     let tipInterval;
-    let materialImageB64 = null;
-    let uploadedImageForListingB64 = null;
+    let mainImageB64 = null;
     let materialsCache = { en: null, hi: null };
     let suppliersCache = { en: null, hi: null };
     let listingCache = { en: null, hi: null };
-    let isMaterialRequestActive = false;
-    let isSuppliersRequestActive = false;
-    let isListingRequestActive = false;
+    
     const artisanTips = {
         en: ["Photograph your work in natural light to capture true colors.", "Tell the story behind your craft. Buyers love connecting with the creator.", "Use social media to showcase your creative process, not just the final product."],
         hi: ["सच्चे रंगों को पकड़ने के लिए अपने काम की तस्वीर प्राकृतिक रोशनी में लें।", "अपनी कला के पीछे की कहानी बताएं। खरीदारों को निर्माता से जुड़ना पसंद है।", "सिर्फ अंतिम उत्पाद ही नहीं, अपनी रचनात्मक प्रक्रिया को प्रदर्शित करने के लिए सोशल मीडिया का उपयोग करें।"]
@@ -151,14 +155,15 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('language', lang);
         document.documentElement.lang = lang;
 
-        if (isMaterialRequestActive && materialsCache[lang]) {
+        // Re-render dynamic content if it exists
+        if (materialsCache.en && materialsCache[lang]) {
             displayMaterials(materialsCache[lang].materials);
             displayPricingSummary(materialsCache[lang].pricing, lang);
         }
-        if (isSuppliersRequestActive && suppliersCache[lang]) {
+        if (suppliersCache.en && suppliersCache[lang]) {
             displaySuppliers(suppliersCache[lang]);
         }
-        if (isListingRequestActive && listingCache[lang]) {
+        if (listingCache.en && listingCache[lang]) {
             displayListingInfo(listingCache[lang], listingResultsContainer, lang);
         }
     };
@@ -211,13 +216,161 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- Event Handlers ---
+    // --- Input Validation & Button State ---
+    const checkInputsAndToggleButtonState = () => {
+        const hasImage = mainImageB64 !== null;
+        const hasDescription = descriptionInput.value.trim() !== '';
+        const canProceed = hasImage && hasDescription;
+        
+        getMaterialsBtn.disabled = !canProceed;
+        getListingBtn.disabled = !canProceed;
+    };
+
+    // --- Image Handling ---
+    const handleImageFile = (file) => {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64StringWithData = reader.result;
+            mainImageB64 = base64StringWithData.replace('data:', '').replace(/^.+,/, '');
+            imagePreview.src = base64StringWithData;
+            imagePreviewContainer.classList.remove('hidden');
+            checkInputsAndToggleButtonState();
+        };
+        reader.readAsDataURL(file);
+    };
+
+    uploadInput.addEventListener('change', (e) => handleImageFile(e.target.files[0]));
+    descriptionInput.addEventListener('input', checkInputsAndToggleButtonState);
+
+    // --- Camera Functionality ---
+    cameraBtn.addEventListener('click', async () => {
+        cameraModal.classList.remove('hidden');
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            cameraFeed.srcObject = stream;
+        } catch (err) {
+            console.error("Error accessing camera:", err);
+            cameraModal.classList.add('hidden');
+        }
+    });
+
+    captureBtn.addEventListener('click', () => {
+        cameraCanvas.width = cameraFeed.videoWidth;
+        cameraCanvas.height = cameraFeed.videoHeight;
+        const context = cameraCanvas.getContext('2d');
+        context.drawImage(cameraFeed, 0, 0, cameraCanvas.width, cameraCanvas.height);
+        const dataUrl = cameraCanvas.toDataURL('image/png');
+        mainImageB64 = dataUrl.replace('data:', '').replace(/^.+,/, '');
+        imagePreview.src = dataUrl;
+        imagePreviewContainer.classList.remove('hidden');
+        closeCamera();
+        checkInputsAndToggleButtonState();
+    });
+
+    const closeCamera = () => {
+        const stream = cameraFeed.srcObject;
+        if (stream) {
+            const tracks = stream.getTracks();
+            tracks.forEach(track => track.stop());
+        }
+        cameraModal.classList.add('hidden');
+    };
+    cancelCaptureBtn.addEventListener('click', closeCamera);
+
+    // --- Speech Recognition ---
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        const updateLang = () => recognition.lang = localStorage.getItem('language') === 'hi' ? 'hi-IN' : 'en-US';
+        updateLang();
+        
+        voiceInputBtn.addEventListener('click', () => {
+            voiceInputBtn.classList.add('active');
+            recognition.start();
+        });
+        recognition.onresult = (e) => {
+            descriptionInput.value += e.results[0][0].transcript + ' ';
+            checkInputsAndToggleButtonState();
+        };
+        recognition.onerror = (e) => { console.error('Speech recognition error:', e.error); };
+        recognition.onend = () => { voiceInputBtn.classList.remove('active'); };
+        languageSwitch.addEventListener('change', updateLang);
+    } else {
+        voiceInputBtn.classList.add('hidden');
+    }
+
+    // --- Main Workflow Actions ---
+    const resetResults = () => {
+        resultsWrapper.classList.add('hidden');
+        materialsResultsContainer.classList.add('hidden');
+        listingResultsContainer.classList.add('hidden');
+        supplierResultsContainer.classList.add('hidden');
+        findSuppliersBtn.classList.add('hidden');
+        materialsCache = { en: null, hi: null };
+        suppliersCache = { en: null, hi: null };
+        listingCache = { en: null, hi: null };
+    };
+
+    getMaterialsBtn.addEventListener('click', async () => {
+        resetResults();
+        const body = { image_data: mainImageB64, description: descriptionInput.value };
+        const data = await performApiCall('/get-materials-all-langs', body, materialsList);
+        
+        if (data && data.materials) {
+            materialsCache.en = data.materials.en;
+            materialsCache.hi = data.materials.hi;
+            const lang = localStorage.getItem('language') || 'en';
+            displayMaterials(materialsCache[lang].materials);
+            displayPricingSummary(materialsCache[lang].pricing, lang);
+            resultsWrapper.classList.remove('hidden');
+            materialsResultsContainer.classList.remove('hidden');
+        }
+    });
+
+    getListingBtn.addEventListener('click', async () => {
+        resetResults();
+        const body = { image_data: mainImageB64, description: descriptionInput.value };
+        const data = await performApiCall('/generate-product-listing', body, listingResultsContainer);
+        if (data && data.listing) {
+            listingCache.en = data.listing.en;
+            listingCache.hi = data.listing.hi;
+            const lang = localStorage.getItem('language') || 'en';
+            displayListingInfo(listingCache[lang], listingResultsContainer, lang);
+            resultsWrapper.classList.remove('hidden');
+            listingResultsContainer.classList.remove('hidden');
+        }
+    });
+    
+    findSuppliersBtn.addEventListener('click', async () => {
+        const lang = localStorage.getItem('language') || 'en';
+        const materials = materialsCache[lang]?.materials;
+        if (!materials || materials.length === 0) return;
+        const materialNames = materials.map(item => item.material);
+
+        suppliersCache = { en: null, hi: null }; // Reset before new call
+
+        const data = await performApiCall('/find-suppliers', { materials: materialNames }, supplierResultsList);
+        if (data && data.suppliers) {
+            suppliersCache.en = data.suppliers.en;
+            suppliersCache.hi = data.suppliers.hi;
+            displaySuppliers(suppliersCache[lang]);
+        }
+    });
+
+    // --- AI Studio ---
+    aiStudioSection.querySelector('.collapsible-header').addEventListener('click', () => {
+        aiStudioSection.classList.toggle('active');
+    });
+
     ideaForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        hideAllSections();
+        hideAllStudioSections();
         const data = await performApiCall('/refine-and-generate-ideas', { prompt: ideaPromptInput.value }, ideaGallery);
         if (data && data.images) {
             displayImages(data.images, ideaGallery, true);
+            ideaResultsContainer.classList.remove('hidden');
             ideaGallerySection.classList.remove('hidden');
         }
     });
@@ -237,116 +390,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data && data.image) displayImages([data.image], editGallery, true);
     });
 
-    uploadImageInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64StringWithData = reader.result;
-            uploadedImageForListingB64 = base64StringWithData.replace('data:', '').replace(/^.+,/, '');
-            uploadImagePreview.src = base64StringWithData;
-            uploadImagePreviewContainer.classList.remove('hidden');
-            listingFromUploadForm.classList.remove('hidden');
-            listingResultsContainer.innerHTML = '';
-            listingResultsContainer.classList.add('hidden');
-        };
-        reader.readAsDataURL(file);
-    });
-    
-    listingFromUploadForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!uploadedImageForListingB64 || !listingDescriptionInput.value) { alert('Please upload an image and provide a description.'); return; }
-        
-        isListingRequestActive = false;
-        listingCache = { en: null, hi: null };
+    const hideAllStudioSections = () => {
+        ideaGallerySection.classList.add('hidden');
+        angleSection.classList.add('hidden');
+        editSection.classList.add('hidden');
+    };
 
-        const body = { image_data: uploadedImageForListingB64, description: listingDescriptionInput.value };
-        const data = await performApiCall('/generate-product-listing', body, listingResultsContainer);
-        if (data && data.listing) {
-            listingCache.en = data.listing.en;
-            listingCache.hi = data.listing.hi;
-            isListingRequestActive = true;
-            const lang = localStorage.getItem('language') || 'en';
-            displayListingInfo(listingCache[lang], listingResultsContainer, lang);
-        }
-    });
-
-    materialImageInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64StringWithData = reader.result;
-            materialImageB64 = base64StringWithData.replace('data:', '').replace(/^.+,/, '');
-            materialImagePreview.src = base64StringWithData;
-            materialImagePreviewContainer.classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-    });
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.lang = localStorage.getItem('language') === 'hi' ? 'hi-IN' : 'en-US';
-        voiceInputBtn.addEventListener('click', () => { voiceInputBtn.textContent = '🎙️'; recognition.start(); });
-        recognition.onresult = (e) => { materialDescriptionInput.value += e.results[0][0].transcript + ' '; };
-        recognition.onerror = (e) => { console.error('Speech recognition error:', e.error); voiceInputBtn.textContent = '🎤'; };
-        recognition.onend = () => { voiceInputBtn.textContent = '🎤'; };
-        languageSwitch.addEventListener('change', (e) => { recognition.lang = e.target.checked ? 'hi-IN' : 'en-US'; });
-    } else {
-        voiceInputBtn.classList.add('hidden');
-    }
-
-    materialForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!materialImageB64 || !materialDescriptionInput.value) { alert('Please upload an image and provide a description.'); return; }
-        
-        isMaterialRequestActive = false;
-        materialsCache = { en: null, hi: null };
-        isSuppliersRequestActive = false;
-        suppliersCache = { en: null, hi: null };
-        
-        findSuppliersBtn.classList.add('hidden');
-        supplierResultsContainer.classList.add('hidden');
-        pricingSummaryContainer.innerHTML = '';
-
-        const lang = localStorage.getItem('language') || 'en';
-        const body = { image_data: materialImageB64, description: materialDescriptionInput.value };
-        const data = await performApiCall('/get-materials-all-langs', body, materialResultsList);
-        
-        if (data && data.materials) {
-            materialsCache.en = data.materials.en;
-            materialsCache.hi = data.materials.hi;
-            isMaterialRequestActive = true;
-            const currentData = materialsCache[lang];
-            displayMaterials(currentData.materials);
-            displayPricingSummary(currentData.pricing, lang);
-        }
-    });
-
-    findSuppliersBtn.addEventListener('click', async () => {
-        const lang = localStorage.getItem('language') || 'en';
-        const materials = materialsCache[lang]?.materials;
-        if (!materials || materials.length === 0) return;
-        const materialNames = materials.map(item => item.material);
-
-        isSuppliersRequestActive = false;
-        suppliersCache = { en: null, hi: null };
-
-        const data = await performApiCall('/find-suppliers', { materials: materialNames }, supplierResultsList);
-        if (data && data.suppliers) {
-            suppliersCache.en = data.suppliers.en;
-            suppliersCache.hi = data.suppliers.hi;
-            isSuppliersRequestActive = true;
-            displaySuppliers(suppliersCache[lang]);
-        }
-    });
-    
     // --- UI Display Functions ---
     const displayMaterials = (materials) => {
-        materialResultsList.innerHTML = '';
-        if (!materials || materials.length === 0) { findSuppliersBtn.classList.add('hidden'); return; }
+        materialsList.innerHTML = '';
+        if (!materials || materials.length === 0) {
+            findSuppliersBtn.classList.add('hidden');
+            return;
+        }
         const ul = document.createElement('ul');
         ul.className = 'materials-list';
         materials.forEach(item => {
@@ -356,38 +412,54 @@ document.addEventListener('DOMContentLoaded', () => {
                     <strong>${item.material}</strong> (Qty: ${item.quantity})
                     <em>${item.reason}</em>
                 </div>
-                <div class="material-cost">
-                    ₹${item.estimated_cost_inr}
-                </div>
+                <div class="material-cost">₹${item.estimated_cost_inr}</div>
             `;
             ul.appendChild(li);
         });
-        materialResultsList.appendChild(ul);
-        materialResultsContainer.classList.remove('hidden');
+        materialsList.appendChild(ul);
         findSuppliersBtn.classList.remove('hidden');
     };
     
-    // REWRITTEN to be more robust
     const displayPricingSummary = (pricing, lang) => {
         pricingSummaryContainer.innerHTML = '';
         if (!pricing) return;
         const text = translations[lang];
 
-        const priceRange = (pricing.suggested_price_range_inr && Array.isArray(pricing.suggested_price_range_inr) && pricing.suggested_price_range_inr.length === 2)
-            ? pricing.suggested_price_range_inr
-            : [0, 0];
-
         pricingSummaryContainer.innerHTML = `
-            <h4 data-key="suggested_price_title">${text.suggested_price_title}</h4>
-            <div class="pricing-grid">
-                <span>${text.total_materials}:</span> <strong>₹${pricing.total_material_cost || 0}</strong>
-                <span>${text.estimated_labor}:</span> <strong>₹${pricing.estimated_labor_inr || 0}</strong>
-                <span>${text.profit_margin}:</span> <strong>${pricing.profit_margin_percent || 0}%</strong>
-                <span>${text.per_piece_cost} (${pricing.units_per_batch || 1} units):</span> <strong>₹${pricing.cost_per_piece_inr || 0}</strong>
+            <h3 class="pricing-header" data-key="price_strat_title">${text.price_strat_title}</h3>
+            <div class="pricing-section">
+                <h4 class="pricing-subheader" data-key="cost_breakdown_title">${text.cost_breakdown_title}</h4>
+                <div class="pricing-row">
+                    <span data-key="total_materials">${text.total_materials}</span>
+                    <span class="price-value">₹${pricing.total_material_cost || 0}</span>
+                </div>
+                <div class="pricing-row-light">
+                    <span data-key="overhead">${text.overhead}</span>
+                    <span class="price-value">${pricing.overhead_contingency_percent || 0}%</span>
+                </div>
+                <div class="pricing-row total-row">
+                    <strong data-key="cost_to_make">${text.cost_to_make}</strong>
+                    <strong class="price-value strong">₹${pricing.cost_to_make || 0}</strong>
+                </div>
+                <div class="pricing-row-light">
+                    <span data-key="units_per_batch">${text.units_per_batch}</span>
+                    <span class="price-value">${pricing.units_per_batch || 1}</span>
+                </div>
+                <div class="pricing-row">
+                    <strong data-key="cost_per_piece">${text.cost_per_piece}</strong>
+                    <strong class="price-value strong">₹${pricing.cost_per_piece_inr || 0}</strong>
+                </div>
             </div>
-            <div class="final-price">
-                <span>${text.selling_price}:</span>
-                <strong>₹${priceRange[0]} - ₹${priceRange[1]}</strong>
+            <div class="pricing-section">
+                <h4 class="pricing-subheader" data-key="pricing_rec_title">${text.pricing_rec_title}</h4>
+                <div class="pricing-row">
+                    <span data-key="wholesale_price">${text.wholesale_price}</span>
+                    <span class="price-value wholesale">₹${pricing.suggested_wholesale_price_inr || 0}</span>
+                </div>
+                <div class="pricing-row">
+                    <span data-key="retail_price">${text.retail_price}</span>
+                    <span class="price-value retail">₹${(pricing.suggested_retail_price_range_inr || [0,0]).join(' - ₹')}</span>
+                </div>
             </div>
         `;
     };
@@ -407,22 +479,16 @@ document.addEventListener('DOMContentLoaded', () => {
         supplierResultsContainer.classList.remove('hidden');
     };
 
-    // REWRITTEN to be more robust and fix bugs
     const displayListingInfo = (data, container, lang) => {
         container.innerHTML = '';
         if (!data) {
             container.innerHTML = '<p class="error">Error: Could not generate listing data.</p>';
-            container.classList.remove('hidden');
             return;
         }
         const text = translations[lang];
-
-        const features = Array.isArray(data.features) ? data.features : [];
-        const featuresHTML = '<ul>' + features.map(f => `<li>${String(f)}</li>`).join('') + '</ul>';
         
-        const keywords = Array.isArray(data.keywords) ? data.keywords : [];
-        const keywordsHTML = `<p class="keywords-list"><strong data-key="listing_keywords_title">${text.listing_keywords_title}:</strong> ${keywords.join(', ')}</p>`;
-        
+        const featuresHTML = '<ul>' + (data.features || []).map(f => `<li>${f}</li>`).join('') + '</ul>';
+        const keywordsHTML = `<p class="keywords-list"><strong>${text.listing_keywords_title}:</strong> ${(data.keywords || []).join(', ')}</p>`;
         const tips = data.platform_tips || {};
         const tipsHTML = `
             <h4>${text.listing_tips_title}</h4>
@@ -434,15 +500,14 @@ document.addEventListener('DOMContentLoaded', () => {
             
         container.innerHTML = `
             <h3>${data.title || ''}</h3>
-            <h4>${text.listing_story_title}</h4>
+            <h4 data-key="listing_story_title">${text.listing_story_title}</h4>
             <p>${(data.story || '').replace(/\n/g, '<br>')}</p>
-            <h4>${text.listing_desc_title}</h4>
+            <h4 data-key="listing_desc_title">${text.listing_desc_title}</h4>
             <p>${(data.description || '').replace(/\n/g, '<br>')}</p>
-            <h4>${text.listing_features_title}</h4>
+            <h4 data-key="listing_features_title">${text.listing_features_title}</h4>
             ${featuresHTML}
             ${keywordsHTML}
             ${tipsHTML}`;
-        container.classList.remove('hidden');
     };
 
     const displayImages = (images, galleryElement, allowSelection) => {
@@ -460,6 +525,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handleImageSelection = (base64, galleryElement, selectedImgElement = null) => {
         const imgSrc = `data:image/png;base64,${base64}`;
+        
+        // Option 1: Set as main image for workflow
+        mainImageB64 = base64;
+        imagePreview.src = imgSrc;
+        imagePreviewContainer.classList.remove('hidden');
+        checkInputsAndToggleButtonState();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Option 2: Set for further editing in AI studio
         selectedImageForAngles.src = imgSrc;
         selectedImageForAngles.dataset.b64 = base64;
         selectedImageForEdit.src = imgSrc;
@@ -470,18 +544,10 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedImgElement.classList.add('selected');
         }
         
-        ideaGallerySection.classList.remove('hidden');
         angleSection.classList.remove('hidden');
         editSection.classList.remove('hidden');
-        
         angleGallery.innerHTML = '';
         editGallery.innerHTML = '';
-    };
-
-    const hideAllSections = () => {
-        ideaGallerySection.classList.add('hidden');
-        angleSection.classList.add('hidden');
-        editSection.classList.add('hidden');
     };
 });
 

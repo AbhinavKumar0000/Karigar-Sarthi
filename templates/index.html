@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Karigar-Sarthi - Your Digital Workshop</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
+    <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
+    <link href="[https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap](https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap)" rel="stylesheet">
 </head>
 <body>
     <header>
@@ -27,111 +27,122 @@
     </header>
 
     <main class="container">
-        <!-- User's starting choices -->
-        <div class="start-choice-container">
-            <section id="idea-section" class="workflow-section">
-                <h2 data-key="idea_title">1. Create a New Idea</h2>
-                <p class="description" data-key="idea_desc">Describe your concept, and our AI will generate four unique designs inspired by diverse Indian aesthetics.</p>
-                <form id="idea-form">
-                    <input type="text" id="idea-prompt-input" data-key-placeholder="idea_placeholder" placeholder="e.g., 'a wooden elephant toy', 'a terracotta Diya'" required>
-                    <button type="submit" data-key="idea_button">Generate Designs</button>
-                </form>
-            </section>
-            
-            <section id="upload-section" class="workflow-section">
-                <h2 data-key="upload_title">2. Create Listing from Image</h2>
-                <p class="description" data-key="upload_desc">Upload a photo of your finished craft, describe it, and we'll generate all the details for your online store.</p>
-                
-                <div class="selected-image-container hidden" id="upload-image-preview-container">
-                    <img id="upload-image-preview" src="" alt="Uploaded craft for listing">
-                </div>
-                
-                <label for="upload-image-input" class="upload-btn" data-key="upload_button">Upload Your Image</label>
-                <input type="file" id="upload-image-input" accept="image/*" class="hidden">
-
-                <form id="listing-from-upload-form" class="hidden">
-                    <textarea id="listing-description-input" data-key-placeholder="listing_from_upload_placeholder" placeholder="Briefly describe your product. e.g., 'Hand-painted wooden coasters with Madhubani art, set of 4.'" required></textarea>
-                    <button type="submit" data-key="listing_button">Generate Listing Details</button>
-                </form>
-
-                <div id="listing-results-container" class="hidden">
-                    <!-- Results will be injected here -->
-                </div>
-            </section>
-        </div>
-
-        <!-- Material Estimator Section -->
-        <section id="material-estimator-section" class="workflow-section">
-            <h2 data-key="material_title">3. Plan Your Craft & Get Materials</h2>
-            <p class="description" data-key="material_desc">Upload a base image, then describe the final product you want to create. Our AI will generate a list of materials you'll need.</p>
-            <div class="material-workflow-container">
-                <div class="material-upload-area">
-                    <label for="material-image-input" class="upload-btn" data-key="material_upload_button">Upload Base Image</label>
-                    <input type="file" id="material-image-input" accept="image/*" class="hidden">
-                    <div class="selected-image-container hidden" id="material-image-preview-container">
-                        <img id="material-image-preview" src="" alt="Image for Material Estimation">
+        <!-- Step 1: User Input Section -->
+        <section class="workflow-section input-section">
+            <h2 data-key="input_title">Start Here: Describe Your Craft</h2>
+            <div class="input-area">
+                <!-- Image Upload Area -->
+                <div class="input-subsection">
+                    <h3 data-key="input_image_title">1. Provide an Image</h3>
+                    <div class="image-preview-container hidden" id="image-preview-container">
+                        <img id="image-preview" src="" alt="Your Uploaded Craft">
                     </div>
+                    <div class="upload-options">
+                        <label for="upload-input" class="action-btn" data-key="upload_button">Upload from Gallery</label>
+                        <button id="camera-btn" class="action-btn secondary" data-key="camera_button">Use Camera</button>
+                    </div>
+                    <input type="file" id="upload-input" accept="image/*" class="hidden">
                 </div>
-                <div class="material-description-area">
-                    <form id="material-form">
-                        <textarea id="material-description-input" data-key-placeholder="material_placeholder" placeholder="Describe the final product..." required></textarea>
-                        <div class="form-controls">
-                            <button type="button" id="voice-input-btn" title="Use Voice Input">🎤</button>
-                            <button type="submit" data-key="material_button">Get Materials List</button>
-                        </div>
+
+                <!-- Description Area -->
+                <div class="input-subsection">
+                    <h3 data-key="input_desc_title">2. Describe the Product</h3>
+                    <form id="description-form">
+                        <textarea id="description-input" data-key-placeholder="input_desc_placeholder" placeholder="Describe your product or the changes you want to make..." required></textarea>
+                        <button type="button" id="voice-input-btn" title="Use Voice Input">
+                            <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                        </button>
                     </form>
                 </div>
             </div>
-            <div id="material-results-container" class="hidden">
-                <h3 data-key="material_results_title">Suggested Materials</h3>
-                <div id="material-results-list"></div>
-                <!-- NEW CONTAINER FOR PRICING -->
-                <div id="pricing-summary-container"></div>
-                <button id="find-suppliers-btn" data-key="find_suppliers_button" class="hidden">Find Online Suppliers</button>
-                <div id="supplier-results-container" class="hidden">
-                    <h4 data-key="suppliers_title">Online Suppliers</h4>
-                    <div id="supplier-results-list"></div>
-                </div>
+             <!-- Main Action Buttons -->
+            <div class="main-actions">
+                <button id="get-materials-btn" class="action-btn primary" data-key="material_button" disabled>Get Materials & Pricing</button>
+                <button id="get-listing-btn" class="action-btn tertiary" data-key="listing_button" disabled>Generate Listing</button>
             </div>
         </section>
 
-        <!-- Galleries and subsequent steps appear here -->
-        <div id="results-container">
-            <section id="idea-gallery-section" class="workflow-section hidden">
-                <h3 data-key="results_title">Generated Designs</h3>
-                <p class="description" data-key="results_desc">Click an image to select it for the next steps.</p>
-                <div id="idea-gallery" class="image-gallery"></div>
-            </section>
-
-            <section id="angle-section" class="workflow-section hidden">
-                <h3 data-key="angle_title">Generate Different Angles</h3>
-                <p class="description" data-key="angle_desc">Create professional product shots for your selected design.</p>
-                <div class="selected-image-container">
-                    <img id="selected-image-for-angles" src="" alt="Selected Design">
+        <!-- Step 2: Results Section -->
+        <section id="results-wrapper" class="hidden">
+            <!-- Material Results -->
+            <div id="materials-results-container" class="workflow-section results-container hidden">
+                <h2 data-key="material_results_title">Materials & Pricing Strategy</h2>
+                <div id="materials-list"></div>
+                <div id="pricing-summary-container"></div>
+                <button id="find-suppliers-btn" data-key="find_suppliers_button" class="action-btn secondary hidden">Find Online Suppliers</button>
+                <div id="supplier-results-container" class="hidden">
+                    <h3 data-key="suppliers_title">Online Suppliers</h3>
+                    <div id="supplier-results-list"></div>
                 </div>
-                <button id="generate-angles-btn" data-key="angle_button">Generate 4 Angles</button>
-                <div id="angle-gallery" class="image-gallery"></div>
-            </section>
+            </div>
+            <!-- Listing Results -->
+            <div id="listing-results-container" class="workflow-section results-container hidden">
+                 <h2 data-key="listing_results_title">Generated Product Listing</h2>
+                <!-- Listing content will be injected here -->
+            </div>
+        </section>
 
-            <section id="edit-section" class="workflow-section hidden">
-                <h3 data-key="edit_title">Edit Your Design</h3>
-                <p class="description" data-key="edit_desc">Describe the changes you want to make to the selected photo.</p>
-                <div class="edit-controls">
-                    <div class="selected-image-container">
-                        <img id="selected-image-for-edit" src="" alt="Image to Edit">
-                    </div>
-                    <div class="edit-form-container">
-                        <form id="edit-form">
-                            <input type="text" id="edit-prompt-input" data-key-placeholder="edit_placeholder" placeholder="e.g., 'make the background blue'" required>
-                            <button type="submit" data-key="edit_button">Apply Edit</button>
-                        </form>
-                    </div>
+
+        <!-- Optional: AI Design Studio -->
+        <section id="ai-studio-section" class="workflow-section secondary-workflow">
+            <div class="collapsible-header">
+                <h2 data-key="idea_title">Optional: AI Design Studio</h2>
+                <span class="toggle-icon">+</span>
+            </div>
+            <div class="collapsible-content">
+                <p class="description" data-key="idea_desc">Don't have an idea? Describe a concept, and our AI will generate four unique designs for you.</p>
+                <form id="idea-form">
+                    <input type="text" id="idea-prompt-input" data-key-placeholder="idea_placeholder" placeholder="e.g., 'a wooden elephant toy'">
+                    <button type="submit" class="action-btn" data-key="idea_button">Generate Designs</button>
+                </form>
+                 <!-- Galleries and subsequent steps appear here -->
+                <div id="results-container" class="hidden">
+                    <section id="idea-gallery-section" class="workflow-section">
+                        <h3 data-key="results_title">Generated Designs</h3>
+                        <p class="description" data-key="results_desc">Click an image to select it or use it as a base for material planning.</p>
+                        <div id="idea-gallery" class="image-gallery"></div>
+                    </section>
+
+                    <section id="angle-section" class="workflow-section hidden">
+                        <h3 data-key="angle_title">Generate Different Angles</h3>
+                        <div class="selected-image-container">
+                            <img id="selected-image-for-angles" src="" alt="Selected Design">
+                        </div>
+                        <button id="generate-angles-btn" class="action-btn" data-key="angle_button">Generate 4 Angles</button>
+                        <div id="angle-gallery" class="image-gallery"></div>
+                    </section>
+
+                    <section id="edit-section" class="workflow-section hidden">
+                        <h3 data-key="edit_title">Edit Your Design</h3>
+                        <div class="edit-controls">
+                            <div class="selected-image-container">
+                                <img id="selected-image-for-edit" src="" alt="Image to Edit">
+                            </div>
+                            <form id="edit-form">
+                                <input type="text" id="edit-prompt-input" data-key-placeholder="edit_placeholder" placeholder="e.g., 'make the background blue'">
+                                <button type="submit" class="action-btn" data-key="edit_button">Apply Edit</button>
+                            </form>
+                        </div>
+                        <div id="edit-gallery" class="image-gallery single-image"></div>
+                    </section>
                 </div>
-                <div id="edit-gallery" class="image-gallery single-image"></div>
-            </section>
-        </div>
+            </div>
+        </section>
     </main>
 
+    <!-- Camera Modal -->
+    <div id="camera-modal" class="modal hidden">
+        <div class="modal-content">
+            <video id="camera-feed" autoplay></video>
+            <canvas id="camera-canvas" class="hidden"></canvas>
+            <div class="modal-controls">
+                <button id="capture-btn" class="action-btn">Capture</button>
+                <button id="cancel-capture-btn" class="action-btn secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loader -->
     <div id="tips-loader" class="hidden">
         <div class="tip-content">
             <div class="spinner"></div>
