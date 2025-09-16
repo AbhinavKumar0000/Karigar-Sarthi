@@ -110,15 +110,19 @@ def refine_and_generate_ideas():
         response = text_model.generate_content(refinement_instruction)
         refined_prompts_raw = json.loads(extract_json_from_response(response.text))
         
-        # FIX: Filter out any empty or whitespace-only prompts
         refined_prompts = [p for p in refined_prompts_raw if p and p.strip()]
         if not refined_prompts:
             return jsonify({"error": "Failed to generate valid, non-empty prompts from the idea."}), 500
 
         image_model = ImageGenerationModel.from_pretrained("imagegeneration@006")
-        base64_images = [base64.b64encode(img._image_bytes).decode('utf-8') for img in image_model.generate_images(prompt=refined_prompts)]
+        base64_images = []
+        for prompt in refined_prompts:
+            gen_response = image_model.generate_images(prompt=prompt, number_of_images=1)
+            base64_images.append(base64.b64encode(gen_response[0]._image_bytes).decode('utf-8'))
+
         return jsonify({"images": base64_images, "prompts": refined_prompts})
     except Exception as e:
+        print(f"ERROR in /refine-and-generate-ideas: {type(e).__name__} - {e}")
         return jsonify({"error": "Failed to generate ideas.", "details": f"{type(e).__name__}: {str(e)}"}), 500
 
 @app.route('/generate-angles', methods=['POST'])
@@ -134,7 +138,6 @@ def generate_angles():
         response = vision_model.generate_content([image_part, "Describe this object in extreme detail for a fellow artisan."])
         image_description = response.text
         
-        # FIX: Ensure image description is not empty before creating prompts
         if not image_description or not image_description.strip():
             return jsonify({"error": "Could not generate a description from the provided image."}), 500
             
@@ -145,9 +148,14 @@ def generate_angles():
             f"Lifestyle photograph of this object: '{image_description}', in a culturally relevant Indian setting."
         ]
         image_model = ImageGenerationModel.from_pretrained("imagegeneration@006")
-        base64_images = [base64.b64encode(img._image_bytes).decode('utf-8') for img in image_model.generate_images(prompt=angle_prompts)]
+        base64_images = []
+        for prompt in angle_prompts:
+            gen_response = image_model.generate_images(prompt=prompt, number_of_images=1)
+            base64_images.append(base64.b64encode(gen_response[0]._image_bytes).decode('utf-8'))
+
         return jsonify({"images": base64_images})
     except Exception as e:
+        print(f"ERROR in /generate-angles: {type(e).__name__} - {e}")
         return jsonify({"error": "Failed to generate angles.", "details": f"{type(e).__name__}: {str(e)}"}), 500
 
 @app.route('/edit-image', methods=['POST'])
@@ -163,7 +171,6 @@ def edit_image():
         response = vision_model.generate_content([image_part, "Describe this object in extreme detail for an AI image model."])
         image_description = response.text
         
-        # FIX: Ensure image description is not empty before creating final prompt
         if not image_description or not image_description.strip():
             return jsonify({"error": "Could not generate a base description from the image for editing."}), 500
             
@@ -173,6 +180,7 @@ def edit_image():
         edited_image_b64 = base64.b64encode(gen_response[0]._image_bytes).decode('utf-8')
         return jsonify({"image": edited_image_b64})
     except Exception as e:
+        print(f"ERROR in /edit-image: {type(e).__name__} - {e}")
         return jsonify({"error": "Failed to edit image.", "details": f"{type(e).__name__}: {str(e)}"}), 500
 
 @app.route('/get-materials-all-langs', methods=['POST'])
@@ -205,6 +213,7 @@ def get_materials_all_langs():
 
         return jsonify({"materials": {"en": en_data, "hi": hi_data}})
     except Exception as e:
+        print(f"ERROR in /get-materials-all-langs: {type(e).__name__} - {e}")
         return jsonify({"error": "Failed to get materials.", "details": f"{type(e).__name__}: {str(e)}"}), 500
 
 @app.route('/find-suppliers', methods=['POST'])
@@ -214,7 +223,7 @@ def find_suppliers():
         data = request.get_json()
         materials = data.get('materials')
         if not materials: return jsonify({"error": "No materials provided"}), 400
-        model = GenerativeModel("emini-2.5-pro")
+        model = GenerativeModel("gemini-2.5-pro")
 
         en_prompt = f"""
         You are a procurement expert for Indian artisans. For the materials list: "{', '.join(materials)}", find online suppliers in India.
@@ -234,6 +243,7 @@ def find_suppliers():
 
         return jsonify({"suppliers": {"en": en_suppliers, "hi": hi_suppliers}})
     except Exception as e:
+        print(f"ERROR in /find-suppliers: {type(e).__name__} - {e}")
         return jsonify({"error": "Failed to find suppliers.", "details": f"{type(e).__name__}: {str(e)}"}), 500
 
 @app.route('/generate-product-listing', methods=['POST'])
@@ -280,9 +290,11 @@ def generate_product_listing():
 
         return jsonify({"listing": {"en": en_listing_data, "hi": hi_listing_data}})
     except Exception as e:
+        print(f"ERROR in /generate-product-listing: {type(e).__name__} - {e}")
         return jsonify({"error": "Failed to generate product listing.", "details": f"{type(e).__name__}: {str(e)}"}), 500
 
 # --- Main Execution ---
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
+
 

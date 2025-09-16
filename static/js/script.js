@@ -232,10 +232,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const reader = new FileReader();
         reader.onloadend = () => {
             const base64StringWithData = reader.result;
-            mainImageB64 = base64StringWithData.replace('data:', '').replace(/^.+,/, '');
+            const base64 = base64StringWithData.replace('data:', '').replace(/^.+,/, '');
+            mainImageB64 = base64; // Set for main workflow
             imagePreview.src = base64StringWithData;
             imagePreviewContainer.classList.remove('hidden');
             checkInputsAndToggleButtonState();
+            
+            // Also set for AI Studio workflow
+            setupImageForEditing(base64);
         };
         reader.readAsDataURL(file);
     };
@@ -261,11 +265,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const context = cameraCanvas.getContext('2d');
         context.drawImage(cameraFeed, 0, 0, cameraCanvas.width, cameraCanvas.height);
         const dataUrl = cameraCanvas.toDataURL('image/png');
-        mainImageB64 = dataUrl.replace('data:', '').replace(/^.+,/, '');
+        const base64 = dataUrl.replace('data:', '').replace(/^.+,/, '');
+        
+        mainImageB64 = base64; // Set for main workflow
         imagePreview.src = dataUrl;
         imagePreviewContainer.classList.remove('hidden');
         closeCamera();
         checkInputsAndToggleButtonState();
+
+        // Also set for AI Studio workflow
+        setupImageForEditing(base64);
     });
 
     const closeCamera = () => {
@@ -379,7 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const imageB64 = selectedImageForAngles.dataset.b64;
         if (!imageB64) return;
         const data = await performApiCall('/generate-angles', { image_data: imageB64 }, angleGallery);
-        if (data && data.images) displayImages(data.images, angleGallery, true);
+        if (data && data.images) displayImages(data.images, angleGallery, false); // Changed to false
     });
 
     editForm.addEventListener('submit', async (e) => {
@@ -387,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const imageB64 = selectedImageForEdit.dataset.b64;
         if (!imageB64) return;
         const data = await performApiCall('/edit-image', { image_data: imageB64, prompt: editPromptInput.value }, editGallery);
-        if (data && data.image) displayImages([data.image], editGallery, true);
+        if (data && data.image) displayImages([data.image], editGallery, false); // Changed to false
     });
 
     const hideAllStudioSections = () => {
@@ -397,6 +406,36 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- UI Display Functions ---
+    // NEW HELPER FUNCTION to set up an image for editing in the AI Studio
+    const setupImageForEditing = (base64) => {
+        const imgSrc = `data:image/png;base64,${base64}`;
+
+        // Set images for AI studio sections
+        selectedImageForAngles.src = imgSrc;
+        selectedImageForAngles.dataset.b64 = base64;
+        selectedImageForEdit.src = imgSrc;
+        selectedImageForEdit.dataset.b64 = base64;
+
+        // Make the parent container for galleries visible
+        ideaResultsContainer.classList.remove('hidden');
+        
+        // Show the specific studio sections for angles and edits
+        angleSection.classList.remove('hidden');
+        editSection.classList.remove('hidden');
+
+        // Automatically expand the AI Design Studio collapsible section
+        if (!aiStudioSection.classList.contains('active')) {
+            aiStudioSection.classList.add('active');
+        }
+
+        // Clear any previous results from these sections
+        angleGallery.innerHTML = '';
+        editGallery.innerHTML = '';
+
+        // Clear any 'selected' state from the main idea gallery
+        ideaGallery.querySelectorAll('img').forEach(img => img.classList.remove('selected'));
+    };
+
     const displayMaterials = (materials) => {
         materialsList.innerHTML = '';
         if (!materials || materials.length === 0) {
@@ -524,30 +563,20 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const handleImageSelection = (base64, galleryElement, selectedImgElement = null) => {
-        const imgSrc = `data:image/png;base64,${base64}`;
-        
-        // Option 1: Set as main image for workflow
+        // Option 1: Set as main image for primary workflow
         mainImageB64 = base64;
-        imagePreview.src = imgSrc;
+        imagePreview.src = `data:image/png;base64,${base64}`;
         imagePreviewContainer.classList.remove('hidden');
         checkInputsAndToggleButtonState();
         window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        // Option 2: Set for further editing in AI studio
-        selectedImageForAngles.src = imgSrc;
-        selectedImageForAngles.dataset.b64 = base64;
-        selectedImageForEdit.src = imgSrc;
-        selectedImageForEdit.dataset.b64 = base64;
+    
+        // Option 2: Use the new helper to set up the image for AI studio functions
+        setupImageForEditing(base64);
         
+        // If an image in a gallery was clicked, highlight it
         if(galleryElement && selectedImgElement) {
             galleryElement.querySelectorAll('img').forEach(img => img.classList.remove('selected'));
             selectedImgElement.classList.add('selected');
         }
-        
-        angleSection.classList.remove('hidden');
-        editSection.classList.remove('hidden');
-        angleGallery.innerHTML = '';
-        editGallery.innerHTML = '';
     };
 });
-
