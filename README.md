@@ -2,21 +2,24 @@
 <h1 style="font-size: 3em; color: #4a90e2;">Karigar-Sarthi</h1>
 <p style="font-size: 1.2em;">Your AI-Powered Digital Workshop</p>
 <p>
-<img src="https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54" alt="Python"/>
-<img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=Flask&logoColor=white" alt="Flask"/>
-<img src="https://img.shields.io/badge/Google%20Cloud-4285F4?&style=plastic&logo=Google%20Cloud&logoColor=white" alt="Google Cloud"/>
-<img src="https://img.shields.io/badge/firebase-ffca28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase"/>
-<img src="https://shields.io/badge/JavaScript-F7DF1E?logo=JavaScript&logoColor=000&style=flat-square" alt="JavaScript"/>
+<img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white&style=flat" alt="Python">
+<img src="https://img.shields.io/badge/Flask-000000?logo=flask&logoColor=white&style=flat" alt="Flask">
+<img src="https://img.shields.io/badge/Google%20Cloud-4285F4?logo=google-cloud&logoColor=white&style=flat" alt="Google Cloud">
+<img src="https://img.shields.io/badge/Firebase-FFCA28?logo=firebase&logoColor=black&style=flat" alt="Firebase">
+<img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black&style=flat" alt="JavaScript">
+<img src="https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white&style=flat" alt="HTML5">
+<img src="https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white&style=flat" alt="CSS3">
+<img src="https://img.shields.io/badge/Gemini-8E2BE2?logo=gemini&logoColor=white&style=flat" alt="Gemini">
 </p>
 </div>
 
 Karigar-Sarthi (कारीगर-सारथी) is an AI-powered digital workshop that helps Indian artisans with design, pricing, and e-commerce listings, bridging the gap between traditional craft and the digital market. The entire application, including all AI-generated content, is fully bilingual, supporting both English and Hindi.
 
-✨ Key Features
+ Key Features
 <table width="100%">
 <tr>
 <td width="50%" valign="top">
-<h3>🎨 AI Design Studio</h3>
+<h3> AI Design Studio</h3>
 <ul>
 <li><b>Idea Generation</b>: Transform a simple concept into four distinct, visually rich designs based on diverse Indian aesthetic themes.</li>
 <li><b>Multi-Angle Views</b>: Generate various photographic angles (side, top-down, 45-degree, lifestyle) for a professional product showcase.</li>
@@ -24,7 +27,7 @@ Karigar-Sarthi (कारीगर-सारथी) is an AI-powered digital wor
 </ul>
 </td>
 <td width="50%" valign="top">
-<h3>💰 Materials & Pricing</h3>
+<h3> Materials & Pricing</h3>
 <ul>
 <li><b>Automated Analysis</b>: Upload an image to get a detailed list of required materials and quantities.</li>
 <li><b>Cost Breakdown</b>: Provides a complete pricing strategy, including material cost, cost-per-piece, and suggested wholesale/retail prices in INR (₹).</li>
@@ -33,7 +36,7 @@ Karigar-Sarthi (कारीगर-सारथी) is an AI-powered digital wor
 </tr>
 <tr>
 <td width="50%" valign="top">
-<h3>🛍️ E-commerce Listings</h3>
+<h3> E-commerce Listings</h3>
 <ul>
 <li><b>Instant Content</b>: Generate a professional product listing kit from a single image.</li>
 <li><b>SEO Optimized</b>: Includes a compelling title, brand story, description, key features, and keywords.</li>
@@ -41,7 +44,7 @@ Karigar-Sarthi (कारीगर-सारथी) is an AI-powered digital wor
 </ul>
 </td>
 <td width="50%" valign="top">
-<h3>🌐 Supplier & Language Support</h3>
+<h3> Supplier & Language Support</h3>
 <ul>
 <li><b>Supplier Discovery</b>: Find online suppliers in India for materials identified by the AI.</li>
 <li><b>Bilingual Interface</b>: Toggle between English and Hindi at any time for all UI elements and AI-generated content.</li>
@@ -50,24 +53,21 @@ Karigar-Sarthi (कारीगर-सारथी) is an AI-powered digital wor
 </tr>
 </table>
 
-🛠️ Technology Stack
+Technology Stack
 Backend: Python with Flask
-
 Frontend: HTML, CSS, vanilla JavaScript
 
 AI & Cloud:
-
 Google Cloud Platform (GCP) for hosting and services.
-
 Vertex AI for accessing generative models:
-
 Gemini 2.5 Pro: Powers all language understanding, JSON generation, translation, and vision analysis tasks.
-
 Imagen: The underlying model for all image generation and editing functionalities.
 
 Authentication: Firebase Authentication for secure user sign-up and login.
 
-🚀 How It Works
+
+How It Works:
+
 Authentication: The user signs up or logs in.
 
 Input: The artisan provides a text prompt for a new idea or uploads an image of an existing product.
@@ -75,37 +75,3 @@ Input: The artisan provides a text prompt for a new idea or uploads an image of 
 AI Processing: The Flask backend sends the input to the appropriate Vertex AI models. For bilingual support, content is generated in English and then translated to Hindi by Gemini.
 
 Output: The application displays the results in a clean, structured format, be it a design gallery, a cost analysis, or a product listing.
-
-⚙️ Setup and Installation
-Clone the repository:
-
-git clone [[https://github.com/your-username/karigar-sarthi.git]([https://github.com/your-username/karigar-sarthi.git](https://github.com/AbhinavKumar0000/Karigar-Sarthi))](https://github.com/AbhinavKumar0000/Karigar-Sarthi)
-cd karigar-sarthi
-
-Set up Python Environment:
-
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-
-Configure Credentials:
-
-Set up a Google Cloud project and enable the Vertex AI API.
-
-Set up a Firebase project and add your config to static/js/auth.js.
-
-Authenticate your environment:
-
-gcloud auth application-default login
-
-Run the Application:
-
-flask run
-
-The app will be available at ...
-
-🤝 Contributing
-Contributions are welcome! Please feel free to submit a pull request or open an issue.
-
-📄 License
-This project is licensed under the MIT License.
