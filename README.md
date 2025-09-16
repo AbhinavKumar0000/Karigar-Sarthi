@@ -2,7 +2,7 @@
 <h1 style="font-size: 3em; color: #4a90e2;">Karigar-Sarthi</h1>
 <p style="font-size: 1.2em;">Your AI-Powered Digital Workshop</p>
 <p>
-<img src="https://www.google.com/search?q=https://img.shields.io/badge/Python-3776AB%3Fstyle%3Dfor-the-badge%26logo%3Dpython%26logoColor%3Dwhite" alt="Python"/>
+<img src="[https://www.google.com/search?q=https://img.shields.io/badge/Python-3776AB%3Fstyle%3Dfor-the-badge%26logo%3Dpython%26logoColor%3Dwhite](https://www.google.com/url?sa=i&url=https%3A%2F%2Fhub.docker.com%2F_%2Fpython&psig=AOvVaw1hDYiqN7aj9VcolKidQbYm&ust=1758100135540000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCJCJz8H33I8DFQAAAAAdAAAAABAE)" alt="Python"/>
 <img src="https://www.google.com/search?q=https://img.shields.io/badge/Flask-000000%3Fstyle%3Dfor-the-badge%26logo%3Dflask%26logoColor%3Dwhite" alt="Flask"/>
 <img src="https://www.google.com/search?q=https://img.shields.io/badge/Google_Cloud-4285F4%3Fstyle%3Dfor-the-badge%26logo%3Dgoogle-cloud%26logoColor%3Dwhite" alt="Google Cloud"/>
 <img src="https://www.google.com/search?q=https://img.shields.io/badge/Firebase-FFCA28%3Fstyle%3Dfor-the-badge%26logo%3Dfirebase%26logoColor%3Dblack" alt="Firebase"/>
