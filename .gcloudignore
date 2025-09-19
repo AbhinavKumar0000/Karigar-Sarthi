@@ -1,0 +1,13 @@
+This file tells gcloud to ignore these files and directories when deploying.
+It's good practice to not upload credentials, local configs, or caches.
+.gcloudignore
+.git
+.gitignore
+pycache/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env

@@ -1,5 +1,7 @@
 Flask==3.0.3
-google-cloud-firestore==2.16.0
-google-cloud-aiplatform==1.54.0
-google-auth==2.29.0
+google-cloud-firestore==2.18.0
+google-cloud-aiplatform==1.66.0
 firebase-admin==6.5.0
+google-auth==2.35.0
+gunicorn==22.0.0
+firebase-admin==6.5.0  # Recommended WSGI server for production

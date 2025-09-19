@@ -192,7 +192,7 @@ def get_materials_all_langs():
         if not all([image_b64, user_description]): return jsonify({"error": "Missing image data or description"}), 400
         image_bytes = base64.b64decode(image_b64)
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
-        model = GenerativeModel("gemini-2.5-pro")
+        model = GenerativeModel("gemini-2.5-flash")
 
         en_prompt = f"""
             You are an expert artisan and cost estimator in India. Analyze the image and the user's goal: "{user_description}".
@@ -223,7 +223,7 @@ def find_suppliers():
         data = request.get_json()
         materials = data.get('materials')
         if not materials: return jsonify({"error": "No materials provided"}), 400
-        model = GenerativeModel("gemini-2.5-pro")
+        model = GenerativeModel("gemini-2.5-flash")
 
         en_prompt = f"""
         You are a procurement expert for Indian artisans. For the materials list: "{', '.join(materials)}", find online suppliers in India.
@@ -256,7 +256,7 @@ def generate_product_listing():
 
         image_bytes = base64.b64decode(image_b64)
         image_part = Part.from_data(data=image_bytes, mime_type="image/png")
-        model = GenerativeModel("gemini-2.5-pro")
+        model = GenerativeModel("gemini-2.5-flash")
 
         en_listing_prompt = f"""
             You are an e-commerce expert for Indian artisans, specializing in platforms like Amazon Karigar, Flipkart Samarth, and ONDC. An artisan has uploaded an image of their product and described it as: "{user_description}".
@@ -295,6 +295,10 @@ def generate_product_listing():
 
 # --- Main Execution ---
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True)
-
+    # The PORT environment variable is set by Cloud Run.
+    # Default to 8080 for local development.
+    port = int(os.environ.get('PORT', 8080))
+    # Run the app, listening on all IPs ('0.0.0.0') and on the port defined by the environment.
+    # Debug mode must be set to False for production.
+    app.run(host='0.0.0.0', port=port, debug=False)
 
