@@ -2,14 +2,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Translations ---
     const translations = {
         en: {
-            main_title: "Karigar-Sarthi",
-            subtitle: "Your AI-Powered Digital Workshop",
+            main_title: "Karigar Sarthi",
+            subtitle: "Your AI Powered Digital Workshop",
             lang_en: "EN", lang_hi: "HI",
-            input_title: "Start Here: Describe Your Craft",
-            input_image_title: "1. Provide an Image",
+            input_title: "Describe Your Craft",
+            input_image_title: "Provide an Image",
             upload_button: "Upload from Gallery",
             camera_button: "Use Camera",
-            input_desc_title: "2. Describe the Product",
+            input_desc_title: "Describe the Product",
             input_desc_placeholder: "Describe your product or the changes you want to make...",
             material_button: "Get Materials & Pricing",
             listing_button: "Generate Listing",
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
             listing_results_title: "Generated Product Listing",
             find_suppliers_button: "Find Online Suppliers",
             suppliers_title: "Online Suppliers",
-            idea_title: "Optional: AI Design Studio",
+            idea_title: "AI Design Studio",
             idea_desc: "Don't have an idea? Describe a concept, and our AI will generate four unique designs for you.",
             idea_placeholder: "e.g., 'a wooden elephant toy'",
             idea_button: "Generate Designs",
@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
             listing_tips_title: "Platform Tips",
         },
         hi: {
-            main_title: "कारीगर-सारथी",
-            subtitle: "आपकी एआई-संचालित डिजिटल कार्यशाला",
+            main_title: "कारीगर सारथी",
+            subtitle: "आपकी एआई संचालित डिजिटल कार्यशाला",
             lang_en: "EN", lang_hi: "HI",
             input_title: "यहां से शुरू करें: अपनी कला का वर्णन करें",
             input_image_title: "१. एक छवि प्रदान करें",
@@ -138,8 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let listingCache = { en: null, hi: null };
     
     const artisanTips = {
-        en: ["Photograph your work in natural light to capture true colors.", "Tell the story behind your craft. Buyers love connecting with the creator.", "Use social media to showcase your creative process, not just the final product."],
-        hi: ["सच्चे रंगों को पकड़ने के लिए अपने काम की तस्वीर प्राकृतिक रोशनी में लें।", "अपनी कला के पीछे की कहानी बताएं। खरीदारों को निर्माता से जुड़ना पसंद है।", "सिर्फ अंतिम उत्पाद ही नहीं, अपनी रचनात्मक प्रक्रिया को प्रदर्शित करने के लिए सोशल मीडिया का उपयोग करें।"]
+        en: ["Photograph your work in natural light to capture true colors.","Tell the story behind your craft. Buyers love connecting with the creator.","Use social media to showcase your creative process, not just the final product.","Collaborate with other local businesses for cross-promotion.", "Offer workshops or classes to share your skills.","Participate in local craft fairs, markets, and festivals.","Create a professional website with an online store.","Build an email list to announce new products and special offers.","Develop a strong brand identity, including a memorable logo and packaging.","Ask for customer reviews and testimonials to build credibility."],
+        hi: ["सच्चे रंगों को दर्शाने के लिए अपने काम की तस्वीरें प्राकृतिक रोशनी में लें।","अपनी कला के पीछे की कहानी बताएं। खरीदारों को निर्माता से जुड़ना पसंद होता है।","सिर्फ अंतिम उत्पाद ही नहीं, बल्कि अपनी रचनात्मक प्रक्रिया को दिखाने के लिए सोशल मीडिया का उपयोग करें।","एक-दूसरे के प्रचार के लिए अन्य स्थानीय व्यवसायों के साथ सहयोग करें।","अपने कौशल को साझा करने के लिए कार्यशालाएं या कक्षाएं आयोजित करें।","स्थानीय शिल्प मेलों, बाजारों और त्योहारों में भाग लें।","एक ऑनलाइन स्टोर के साथ एक पेशेवर वेबसाइट बनाएं।","नए उत्पादों और विशेष प्रस्तावों की घोषणा के लिए एक ईमेल सूची बनाएं।","एक यादगार लोगो और पैकेजिंग सहित एक मजबूत ब्रांड पहचान विकसित करें।","विश्वसनीयता बनाने के लिए ग्राहकों से समीक्षाएं और प्रशंसापत्र मांगें।"],
     };
 
     // --- Language Functions ---
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tipText.style.animation = 'none';
             setTimeout(() => {
                 tipText.textContent = tips[tipIndex];
-                tipText.style.animation = 'fadeIn 0.5s ease-in-out';
+                tipText.style.animation = 'fadeIn 1s ease-in-out';
             }, 100);
         }, 3500);
     };

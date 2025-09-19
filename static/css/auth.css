@@ -1,13 +1,14 @@
 :root {
-    --primary-color: #4a90e2;
-    --primary-hover: #357abd;
-    --background-color: #f4f7f6;
-    --text-color: #333;
-    --card-bg: #ffffff;
-    --border-color: #e0e0e0;
-    --shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
-    --error-color: #e74c3c;
-    --icon-color: #999;
+    --primary-color: #ff6f00; /* Saffron - vibrant and culturally significant */
+    --primary-hover: #e55f00; /* Darker saffron for hover effects */
+    --primary-active: #cc5500; /* Even darker saffron for active state */
+    --background-color: #b8d59b; /* Light cream - reminiscent of handwoven fabrics */
+    --text-color: #2c1b07; /* Dark brown - earthy and grounded */
+    --card-bg: #ffffff; /* White - clean canvas for artisan work */
+    --border-color: #d4a017; /* Gold-like accent - inspired by jewelry and embroidery */
+    --shadow: 0 10px 30px rgba(44, 27, 7, 0.1); /* Subtle shadow with earthy tone */
+    --error-color: #b00020; /* Deep red - inspired by sindoor */
+    --icon-color: #4a2c07; /* Darker brown for icons */
 }
 
 body {
@@ -19,6 +20,20 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(255, 111, 0, 0.05), transparent);
+    animation: patternFlow 8s linear infinite;
+    z-index: -1;
 }
 
 .auth-container {
@@ -31,6 +46,19 @@ body {
     max-width: 420px;
     text-align: center;
     animation: fade-in 0.5s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), #138808, var(--error-color));
+    animation: borderFlow 5s linear infinite;
 }
 
 @keyframes fade-in {
@@ -38,8 +66,22 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes borderFlow {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 200% 0%; }
+    background-size: 200%;
+}
+
+@keyframes patternFlow {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+    background-size: 200%;
+}
+
 .auth-header {
     margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
 }
 
 .auth-header h1 {
@@ -50,7 +92,7 @@ body {
 }
 
 .auth-header p {
-    color: #666;
+    color: #4a2c07;
     font-size: 1rem;
 }
 
@@ -58,6 +100,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
+    position: relative;
+    z-index: 1;
 }
 
 .form-group {
@@ -71,11 +115,12 @@ body {
     transform: translateY(-50%);
     color: var(--icon-color);
     pointer-events: none;
+    transition: color 0.3s ease;
 }
 
 .form-group input {
     width: 100%;
-    padding: 0.85rem 1rem 0.85rem 3rem; /* Adjusted for icon */
+    padding: 0.85rem 1rem 0.85rem 3rem;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
@@ -85,13 +130,17 @@ body {
 }
 
 .form-group input::placeholder {
-    color: #aaa;
+    color: #7a5a20;
 }
 
 .form-group input:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.2);
+    box-shadow: 0 0 0 4px rgba(255, 111, 0, 0.2);
+}
+
+.form-group input:focus + .feather {
+    color: var(--primary-color);
 }
 
 .auth-button {
@@ -102,45 +151,85 @@ body {
     border-radius: 8px;
     font-size: 1rem;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
     margin-top: 1rem;
     width: 100%;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.auth-button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(229, 95, 0, 0.3), transparent);
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+    z-index: -1;
+}
+
+.auth-button:hover::after {
+    width: 150%;
+    height: 150%;
 }
 
 .auth-button:hover {
     background-color: var(--primary-hover);
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(44, 27, 7, 0.2);
+}
+
+.auth-button:active {
+    background-color: var(--primary-active);
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(44, 27, 7, 0.3);
+}
+
+.auth-button:active::after {
+    background: radial-gradient(circle, rgba(204, 85, 0, 0.4), transparent);
+    width: 150%;
+    height: 150%;
 }
 
 .auth-footer {
     margin-top: 2rem;
     font-size: 0.9rem;
+    position: relative;
+    z-index: 1;
 }
 
 .auth-footer a {
     color: var(--primary-color);
     text-decoration: none;
     font-weight: 600;
+    transition: color 0.3s ease;
 }
 
 .auth-footer a:hover {
+    color: var(--primary-hover);
     text-decoration: underline;
 }
 
 .error-message {
     color: var(--error-color);
-    background-color: rgba(231, 76, 60, 0.1);
-    border: 1px solid rgba(231, 76, 60, 0.2);
+    background-color: rgba(176, 0, 32, 0.1);
+    border: 1px solid rgba(176, 0, 32, 0.2);
     border-radius: 8px;
     font-size: 0.9rem;
     min-height: 1.2em;
     padding: 0.75rem;
     text-align: center;
     margin-bottom: 1rem;
-    display: none; /* Hidden by default */
+    display: none;
     animation: shake 0.5s;
+    position: relative;
+    z-index: 1;
 }
 
 .error-message.visible {
@@ -148,8 +237,8 @@ body {
 }
 
 @keyframes shake {
-  10%, 90% { transform: translate3d(-1px, 0, 0); }
-  20%, 80% { transform: translate3d(2px, 0, 0); }
-  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-  40%, 60% { transform: translate3d(4px, 0, 0); }
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
 }

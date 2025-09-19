@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Karigar-Sarthi - Your Digital Workshop</title>
+    <title>Karigar Sarthi</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='file.svg') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
     <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
@@ -11,9 +12,9 @@
 </head>
 <body>
     <header>
-        <h1 data-key="main_title">Karigar-Sarthi</h1>
+        <h1 data-key="main_title">Karigar Sarthi</h1>
         <div class="header-controls">
-            <p data-key="subtitle">Your AI-Powered Digital Workshop</p>
+            <p data-key="subtitle">Your AI Powered Digital Workshop</p>
             <div class="language-toggle">
                 <span data-key="lang_en">EN</span>
                 <label class="switch">
@@ -29,11 +30,11 @@
     <main class="container">
         <!-- Step 1: User Input Section -->
         <section class="workflow-section input-section">
-            <h2 data-key="input_title">Start Here: Describe Your Craft</h2>
+            <h2 data-key="input_title">Describe Your Craft</h2>
             <div class="input-area">
                 <!-- Image Upload Area -->
                 <div class="input-subsection">
-                    <h3 data-key="input_image_title">1. Provide an Image</h3>
+                    <h3 data-key="input_image_title">Provide an Image</h3>
                     <div class="image-preview-container hidden" id="image-preview-container">
                         <img id="image-preview" src="" alt="Your Uploaded Craft">
                     </div>
@@ -46,7 +47,7 @@
 
                 <!-- Description Area -->
                 <div class="input-subsection">
-                    <h3 data-key="input_desc_title">2. Describe the Product</h3>
+                    <h3 data-key="input_desc_title">Describe the Product</h3>
                     <form id="description-form">
                         <textarea id="description-input" data-key-placeholder="input_desc_placeholder" placeholder="Describe your product or the changes you want to make..." required></textarea>
                         <button type="button" id="voice-input-btn" title="Use Voice Input">
@@ -86,7 +87,7 @@
         <!-- Optional: AI Design Studio -->
         <section id="ai-studio-section" class="workflow-section secondary-workflow">
             <div class="collapsible-header">
-                <h2 data-key="idea_title">Optional: AI Design Studio</h2>
+                <h2 data-key="idea_title">AI Design Studio</h2>
                 <span class="toggle-icon">+</span>
             </div>
             <div class="collapsible-content">
