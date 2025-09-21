@@ -247,45 +247,62 @@ document.addEventListener('DOMContentLoaded', () => {
     uploadInput.addEventListener('change', (e) => handleImageFile(e.target.files[0]));
     descriptionInput.addEventListener('input', checkInputsAndToggleButtonState);
 
-    // --- Camera Functionality ---
-    cameraBtn.addEventListener('click', async () => {
-        cameraModal.classList.remove('hidden');
+// --- Camera Functionality ---
+cameraBtn.addEventListener('click', async () => {
+    cameraModal.classList.remove('hidden');
+
+    // Define constraints to request the REAR camera
+    const constraints = {
+        video: {
+            facingMode: { exact: "environment" } // 'environment' = rear camera
+        }
+    };
+
+    try {
+        // First, try to get the rear camera using the constraints
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        cameraFeed.srcObject = stream;
+    } catch (err) {
+        console.error("Rear camera not found or failed, trying default camera:", err);
+        // If the rear camera isn't available, fall back to any camera
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             cameraFeed.srcObject = stream;
-        } catch (err) {
-            console.error("Error accessing camera:", err);
+        } catch (fallbackErr) {
+            console.error("Error accessing any camera:", fallbackErr);
+            alert("Could not access camera. Please check permissions.");
             cameraModal.classList.add('hidden');
         }
-    });
+    }
+});
 
-    captureBtn.addEventListener('click', () => {
-        cameraCanvas.width = cameraFeed.videoWidth;
-        cameraCanvas.height = cameraFeed.videoHeight;
-        const context = cameraCanvas.getContext('2d');
-        context.drawImage(cameraFeed, 0, 0, cameraCanvas.width, cameraCanvas.height);
-        const dataUrl = cameraCanvas.toDataURL('image/png');
-        const base64 = dataUrl.replace('data:', '').replace(/^.+,/, '');
-        
-        mainImageB64 = base64; // Set for main workflow
-        imagePreview.src = dataUrl;
-        imagePreviewContainer.classList.remove('hidden');
-        closeCamera();
-        checkInputsAndToggleButtonState();
+captureBtn.addEventListener('click', () => {
+    cameraCanvas.width = cameraFeed.videoWidth;
+    cameraCanvas.height = cameraFeed.videoHeight;
+    const context = cameraCanvas.getContext('2d');
+    context.drawImage(cameraFeed, 0, 0, cameraCanvas.width, cameraCanvas.height);
+    const dataUrl = cameraCanvas.toDataURL('image/png');
+    const base64 = dataUrl.replace('data:', '').replace(/^.+,/, '');
 
-        // Also set for AI Studio workflow
-        setupImageForEditing(base64);
-    });
+    mainImageB64 = base64; // Set for main workflow
+    imagePreview.src = dataUrl;
+    imagePreviewContainer.classList.remove('hidden');
+    closeCamera();
+    checkInputsAndToggleButtonState();
 
-    const closeCamera = () => {
-        const stream = cameraFeed.srcObject;
-        if (stream) {
-            const tracks = stream.getTracks();
-            tracks.forEach(track => track.stop());
-        }
-        cameraModal.classList.add('hidden');
-    };
-    cancelCaptureBtn.addEventListener('click', closeCamera);
+    // Also set for AI Studio workflow
+    setupImageForEditing(base64);
+});
+
+const closeCamera = () => {
+    const stream = cameraFeed.srcObject;
+    if (stream) {
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+    }
+    cameraModal.classList.add('hidden');
+};
+cancelCaptureBtn.addEventListener('click', closeCamera);
 
     // --- Speech Recognition ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
