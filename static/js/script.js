@@ -303,7 +303,6 @@ const closeCamera = () => {
     cameraModal.classList.add('hidden');
 };
 cancelCaptureBtn.addEventListener('click', closeCamera);
-
     // --- Speech Recognition ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {

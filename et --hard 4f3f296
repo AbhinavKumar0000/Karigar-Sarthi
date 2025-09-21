@@ -1,0 +1,29 @@
+[33m6d39673[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m bugs fixed
+[33m4f3f296[m ui updated
+[33m4ae505d[m d
+[33m999750b[m deply
+[33m267f8d3[m req
+[33m75b4e0d[m vercel
+[33md0fcf7e[m git push origin mainMerge branch 'main' of https://github.com/AbhinavKumar0000/Karigar-Sarthi
+[33m1477528[m deploy
+[33me924976[m Update README.md
+[33mabe108b[m Update README.md
+[33meee3d79[m Update README.md
+[33m35521d9[m Update README.md
+[33m6aef1c0[m Update README.md
+[33mcefbd64[m prototype done : -> some ui fixing is left
+[33m9a0b454[m all functions are working: problem-> ui update is required
+[33mc1b5733[m updated ui with better buttons: problem: pc ui and generate image not working and authetication error ui update
+[33me56d6c8[m get_listing_info is fixed
+[33m89f50a1[m every wthing is done: problem-> ui and the language transaltion
+[33md813fd6[m add get lsiting and accurate wesbite redirect: problem-> ui changes and aproximate pricing
+[33m03d3bec[m add website for buying product done: problem=> websites are not accurate, the generate lisign is inside the image
+[33m2c521ee[m model changed to gemini-2.5-pro
+[33m708ec35[m add authetication system successfull: problem-> add extra enetires like place and username and name of artisan
+[33md9760fb[m added material req section with voice and image upload : chnage model name
+[33mab17548[m ui is updated: image generation out of cotext, prompt: if user provide style then all image should generate in that partucular style only other than that image should generate in 4 different style, loading screen can be better, decreption generationn is pending, and next main target is matelial required, where we can buy the material
+[33m0bb6a20[m image generation pipline completed. Problem -> promt refining req, description generation left, light model test
+[33ma169ad9[m edit option add and multiple image generating but not with same context and angle issue is also there
+[33me2b27b0[m Merge branch 'main' of https://github.com/AbhinavKumar0000/Karigar-Sarthi
+[33m17cc481[m add image generation with different angle and GCP connected --> problem: different images are generating with image angles
+[33mb0ce4cb[m Initial commit
