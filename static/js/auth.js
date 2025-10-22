@@ -1,12 +1,12 @@
 // IMPORTANT: Paste your Firebase config object here from Step 1.4
 const firebaseConfig = {
-  apiKey: "AIzaSyCPaL2Eoa8BsPqMC03jNfhnMijwG6-A42U",
-  authDomain: "burnished-sweep-471303-v4.firebaseapp.com",
-  projectId: "burnished-sweep-471303-v4",
-  storageBucket: "burnished-sweep-471303-v4.appspot.com",
-  messagingSenderId: "1042553463223",
-  appId: "1:1042553463223:web:286c8a1528f901feed0832",
-  measurementId: "G-CG7NRWFD81"
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: "",
+  measurementId: ""
 };
 
 // Initialize Firebase
